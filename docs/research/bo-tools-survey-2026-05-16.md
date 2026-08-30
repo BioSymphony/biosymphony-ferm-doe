@@ -1,14 +1,17 @@
 # BO-Tools Landscape Survey, 2026-05-16
 
-**Triggered by:** the question whether ENTMOOT is "pretty old" vs newer AI-based tooling
-**Method:** 4-corpus research swarm (LLM/foundation BO, constrained BO landscape, bioprocess-specific tools, BoFire main + competitor frameworks)
-**Evidence files:** survey notes captured during a 4-corpus dispatch (4 files, ~990 lines, ~76 citations across corpora).
+> Historical snapshot. This survey preserves the tool and repository state
+> observed on 2026-05-16. For current upstream versions, licensing, and adapter
+> status, use [`../tool-registry.json`](../tool-registry.json).
+
+**Question:** whether ENTMOOT remained useful beside newer AI-based tooling
+**Method:** four public-source corpora covering foundation-model BO, constrained BO, bioprocess tools, and BoFire alternatives
 
 ---
 
 ## TL;DR
 
-The instinct was reasonable but ENTMOOT does not need replacing. Across all four corpora, **no 2024-2026 alternative cleanly supersedes ENTMOOT v2 for "GBT surrogate + hard MIP NChooseK"**. The AI-native wave (LLAMBO, BORA, GIT-BO, TabPFN v2, PFN-CEI) is real and worth pilots, but every entry either skips cardinality entirely or treats it as an optimizer-layer concern. The ENTMOOT v2 swap (`docs/ENTMOOT_SWAP_DESIGN.md`) remains the right next move, and we should route through BoFire's existing `EntingStrategy` wrapper rather than building a parallel adapter from scratch. In parallel, three low-cost AI-native pilots have positive expected value: **LLAMBO warmstart** for early-iteration leverage, **TabPFN v2 surrogate** for our small-data regime, and **BayBe** (Merck KGaA, Apache-2.0, 462 stars) as a Bayer-independent second-bioprocess-aware BO option if BoFire's NChooseK trap keeps biting.
+The May survey did not identify a 2024-2026 alternative that clearly replaced ENTMOOT v2 for the specific combination of a tree surrogate, hard MIP constraints, and NChooseK. The surveyed foundation-model and language-model approaches either omitted cardinality or left it to the optimizer layer. The resulting plan was to retain the ENTMOOT route and evaluate three bounded alternatives: an LLAMBO warm start, a TabPFN surrogate for small datasets, and BayBE as a second bioprocess-oriented backend. Those were audit-time conclusions; the current registry records which routes were later adopted.
 
 ---
 
@@ -30,7 +33,7 @@ The instinct was reasonable but ENTMOOT does not need replacing. Across all four
 
 ## Cross-corpus divergence (gaps and disagreements)
 
-1. **Atlas's NChooseK story is murky.** One corpus (constrained BO) describes Atlas constraint API as supporting known + unknown constraints but says NChooseK "would not be MIP-encoded, would rely on rejection or penalty." A framework corpus calls Atlas constraint handling "not exercised in tutorials." Triangulated answer: Atlas does not solve our cardinality bottleneck; reclassify from "watch-as-NChooseK-candidate" to "watch-for-unknown-feasibility."
+1. **Atlas's NChooseK support was unclear.** One source described known and unknown constraints but indicated that NChooseK would rely on rejection or penalties rather than a MIP encoding. Another noted that the tutorials did not exercise the relevant constraint handling. The survey therefore treated Atlas as an unknown-feasibility watch item, not an NChooseK route.
 
 2. **BoFire's `LlmStrategy` status.** One corpus: "Searched, no `LlmStrategy` exists" in mainline. Another corpus: PR #749 LLM Strategy was **merged 2026-04-30**. Reconciliation: the first inspected the 0.3.1 release surface (correct that it does not exist there); the second inspected main (correct that it merged after 0.3.1 tagged). Treat as "exists on main, not in released 0.3.1, research-grade per author."
 
@@ -38,7 +41,7 @@ The instinct was reasonable but ENTMOOT does not need replacing. Across all four
 
 4. **GIT-BO maturity.** Flagged as "the most exciting recent result" for foundation-model BO but "reference implementation appears not-yet-public." No other corpus surveyed it. Treat as research-watch only.
 
-5. **Multi-fidelity scale-bridge for Phase 3.** Martens et al. (arXiv 2508.10970, Aug 2025) end-to-end MFBBO on CHO simulator, direct validation of our v0.5 roadmap. BoFire PR #705 (MF) merged 2026-05-11 but `MultiFidelityVarianceBasedStrategy` crashes on non-box constraints (issue #761 we filed). Gap: no corpus has a concrete recommended path for MF + NChooseK joint, which is the Phase 3 bottleneck.
+5. **Multi-fidelity scale bridge.** Martens et al. (arXiv 2508.10970, Aug 2025) described end-to-end MFBBO on a CHO simulator. BoFire PR #705 merged on 2026-05-11, but the May compatibility check found that `MultiFidelityVarianceBasedStrategy` rejected non-box constraints, recorded in issue #761. The survey found no concrete route that jointly handled multi-fidelity and NChooseK.
 
 ---
 
@@ -66,7 +69,7 @@ The instinct was reasonable but ENTMOOT does not need replacing. Across all four
 
 ### 3. Pilot LLAMBO warmstart via OptunaHub sampler
 
-**Finding:** LLAMBO (ICLR 2024) is the only LLM-BO piece in this survey with mature packaging (OptunaHub sampler, MIT license, verified Optuna 4.1.0, last update 2025-03-28). Install is trivial (pip + provider API key). The published scope-limit (insensitivity to experimental feedback per Gupta 2024) lines up perfectly with "use for warmstart only."
+**Finding:** LLAMBO (ICLR 2024) was the only LLM-BO entry in this survey with an OptunaHub package. It requires the Python package and credentials for an external model service. The cited feedback-sensitivity limit supports a warm-start-only scope.
 
 **What changes:** Add `--use-llambo-warmstart` flag to first-batch design generator. Test scope: "does an LLM seed beat Latin hypercube for the first 5-10 trials?" Failure mode is contained.
 
@@ -74,7 +77,7 @@ The instinct was reasonable but ENTMOOT does not need replacing. Across all four
 
 ### 4. Pilot TabPFN v2 as alternative surrogate
 
-**Finding:** Our regime (N=16 to N=50, mixed continuous + categorical, no analytical gradient) is close to the training distribution TabPFN v2 was meta-trained for. The packaging and ecosystem signals are comparatively mature (Prior Labs commercial backing, Nature paper, CRAN bindings).
+**Finding:** The surveyed campaign shape used 16 to 50 rows, mixed continuous and categorical factors, and no analytical gradient. That shape was close to the reported TabPFN v2 training distribution.
 
 **Evidence:** Strongest packaging signal in this survey. GIT-BO (arXiv 2505.20685) demonstrated TabPFN v2 + active subspace beats SAASBO/TuRBO/BAxUS up to 500 D with no online retraining.
 
@@ -106,7 +109,7 @@ The instinct was reasonable but ENTMOOT does not need replacing. Across all four
 | **ProcessOptimizer (Novo Nordisk)** | Production, BSD-3 | None | Strong (pharma-affiliated) | BSD-3 | Add as scikit-optimize migration target |
 | **TabPFN v2** | Production (Prior Labs) | None (surrogate-only) | Strong (small-data tabular) | Apache-2.0 | Pilot as drop-in BoTorch surrogate |
 | **LLAMBO** | Optuna-packaged, MIT | None (cat→random) | Medium (warmstart only) | MIT | Pilot warmstart only |
-| **BORA** | Conference-mature, no stable pkg | Inherits | Strong (matches our NOTES.md) | Paper code only | Defer until reference impl ships |
+| **BORA** | Conference-mature, no stable pkg | Inherits | Strong in the surveyed evidence | Paper code only | Defer until a reference implementation ships |
 | **GIT-BO** | ICML 2025 workshop | Not addressed | Medium (small-D doesn't need 500-D) | Code TBD | Watch for stable release |
 | **PFN-CEI** | Journal-mature, single group | Inequality only (18-var cap) | Medium | BoTorch + PFNs4BO | Defer; inequality-only, no cardinality |
 | **BoTorch direct (EIpu)** | Production, Meta | Manual via narrow-Gaussian | Strong (cost-aware bio) | MIT | Sibling adapter when cost is primary response |
@@ -123,35 +126,35 @@ The instinct was reasonable but ENTMOOT does not need replacing. Across all four
 
 The original `docs/ENTMOOT_SWAP_DESIGN.md` proposes a parallel `adapters/entmoot.py` that translates manifests directly to `entmoot.ProblemConfig`. BoFire already ships an `EntingStrategy` wrapper, and the BoFire CHANGELOG bumps `entmoot>=2.1.1`. This means:
 
-- **The translation work is partly already done in BoFire's wrapper.** Re-implementing it in our own adapter is duplicate effort.
-- **The three documented risks survive either way.** The `min_count` not-emitted bug (risk 1) is upstream; patching it in our wrapper vs in BoFire's wrapper is the same patch. `gurobipy>=11` hard dep (risk 2) is unavoidable. `_fantasy_tell` tie-cycle (risk 3) is solver-side.
+- **BoFire's wrapper already covered part of the translation.** A parallel implementation would duplicate that work.
+- **The three documented risks applied to either route at survey time.** They were missing `min_count` emission, a `gurobipy>=11` dependency, and a `_fantasy_tell` tie cycle. The delivered in-repo ENTMOOT adapter later addressed all three at its boundary.
 - **Routing decision becomes cleaner.** With `EntingStrategy` accessible inside `adapters/bofire_strategy.py`, the dispatch rule is: "Domain has NChooseKConstraint AND single-objective → route to `EntingStrategy` instead of `SoboStrategy`." No new adapter package needed; route stays inside the existing BoFire adapter boundary.
 
 **Concrete pivot:**
 
 1. Add `_route_to_enting_when_nchoosek` branch inside `adapters/bofire_strategy.py`. Mirror the BoFire-wrapper API.
 2. Subclass BoFire's `NChooseKConstraint` translator to emit the missing `Σ z_i ≥ min_count` Pyomo expression (the same risk-1 patch the original swap design proposed, but applied at the BoFire boundary instead of in a parallel adapter).
-3. Probe `pyo.SolverFactory("gurobi").available()` at strategy init; fall through to HiGHS / GLPK / SCIP per the original design (risk 2). Document BYO-solver in `[adaptive]` extras notes.
+3. Probe `pyo.SolverFactory("gurobi").available()` when the strategy starts. If it is unavailable, try HiGHS, GLPK, and SCIP in that order. Document the solver requirement in the `[adaptive]` extra.
 4. Keep the design doc as the methodological reference; add a status note at the top: "Pivoted 2026-05-16: route through BoFire `EntingStrategy` rather than parallel adapter. Three risks unchanged; mitigation patches stay local to the routing layer."
 
 If BoFire's `EntingStrategy` turns out to be missing a critical hook at the wrapper layer (e.g., cannot inject a custom MIP block), fall back to the original parallel-adapter design.
 
 ## What this means for BoFire stance
 
-**Stay on 0.3.1.** Do not bump the floor until 0.4 tags AND PR #693 or #747 merges (NChooseK fixes) AND issue #761 (our MultiFidelityVarianceBasedStrategy non-box-constraint crash) is acknowledged or fixed.
+**Audit-time decision: stay on 0.3.1.** BoFire 0.4 and 0.5 have since shipped, and issue #761 is closed. The primary adapter range remains unchanged because later releases have not been evaluated against the public compatibility fixtures.
 
 **Track these PRs in `docs/BOFIRE_POSITIONING.md`:**
 
 - **#693 MCTS-based ACQF for NChooseK**, direct upstream fix to #450
 - **#747 BONSAI-style greedy pruning for NChooseK**, alternative fix
-- **#740 Nonlinear constraints integration**, would let our adapter handle nonlinear cost constraints natively
-- **#705 Multi-Output Multi-Fidelity** (merged 2026-05-11), the strategy that hits our #761
+- **#740 Nonlinear constraints integration**, relevant to native nonlinear cost constraints
+- **#705 Multi-Output Multi-Fidelity** (merged 2026-05-11), the strategy exercised by issue #761
 - **#731 PFN Surrogate**, future warmstart path
 - **#749 LLM Strategy** (merged 2026-04-30), research-grade; evaluate when 0.4 tags
 
-**Do not pilot anything new on main today.** BoFire main is in feature-add mode (PR #760 opened 2026-05-14). 0.4 timing is "late June or July 2026 at earliest" per release cadence analysis.
+**Audit-time decision: do not build against a moving main branch.** That timing note is historical; the repository now uses a tagged 0.4.1 candidate for its separate NChooseK DoE evaluation lane.
 
-**Add BayBe as second-bioprocess-aware option.** Apache-2.0 license gives us a Bayer-independent fallback if BoFire upstream priorities drift. BayBe's surface is leaner (no DoEStrategy/IPOPT layer) which is a feature for the practitioner audience even if it loses on advanced constrained DoE generation.
+**Evaluate BayBE as a second bioprocess-oriented option.** Its Apache-2.0 license and narrower surface made it a useful comparison route beside BoFire. The current evaluation extra remains pinned to BayBE 0.14.3; upstream 0.15.0 includes breaking changes.
 
 ## What this means for AI-native exploration
 
@@ -159,7 +162,7 @@ If BoFire's `EntingStrategy` turns out to be missing a critical hook at the wrap
 
 1. **LLAMBO warmstart (2-day pilot).** Add `--use-llambo-warmstart` to first-batch design generator via OptunaHub sampler. Compare first-batch performance against Latin hypercube on a stabilized Phase 1 dataset. Scope: warmstart only; the Gupta 2024 negative result makes inner-loop unsupervised use unethical.
 
-2. **TabPFN v2 surrogate (3-4 day pilot).** Build BoTorch-compatible TabPFN forward-pass wrapper. Benchmark against BoFire GP surrogate on the same training data. Constraints stay with the optimizer layer (BoFire or ENTMOOT). Highest-upside / lowest-risk piece of foundation-model BO we can pilot.
+2. **TabPFN v2 surrogate.** Build a BoTorch-compatible forward-pass wrapper and compare it with the BoFire GP surrogate on the same training data. Keep constraints in the optimizer layer. This route was later delivered as the optional TabPFN adapter; current license terms are recorded in the tool registry.
 
 **Defer:**
 
@@ -169,9 +172,9 @@ If BoFire's `EntingStrategy` turns out to be missing a critical hook at the wrap
 
 **Reject:**
 
-- **Replacing the BO inner loop with an LLM.** Gupta et al. (arXiv 2509.21403) demonstrated LLM agents are insensitive to experimental feedback (label permutation test holds across multiple frontier models). Hard veto for any production path.
+- **Replacing the BO inner loop with an LLM.** Gupta et al. (arXiv 2509.21403) reported that the evaluated LLM agents were insensitive to experimental feedback. Do not use this route for load-bearing candidate selection.
 
-**One pattern worth replicating qualitatively at zero engineering cost:** BO-ICL (Ramos et al., ACS Central Science 2025) had a frozen GPT-3.5 surrogate identify near-optimal multi-metallic catalysts in 6 iterations from 3,700 candidates. The natural-language framing apparently gave it implicit cardinality awareness. We can mimic this pattern by asking an LLM to comment on rejected candidates as a NOTES.md augmenter, no infra change required.
+**One bounded pattern to evaluate:** BO-ICL (Ramos et al., ACS Central Science 2025) reported that a frozen GPT-3.5 surrogate identified a near-optimal multi-metallic catalyst in six iterations from 3,700 candidates. A future evaluation could limit the model to commentary on rejected candidates in `NOTES.md`; it must not control the optimization loop.
 
 ---
 
@@ -255,7 +258,7 @@ If BoFire's `EntingStrategy` turns out to be missing a critical hook at the wrap
 65. BoFire PR #731 PFN Surrogate (open)
 66. BoFire PR #752 True NChooseK for DoE
 67. BoFire issue #450, Slow optimization for high-dim NChooseK
-68. BoFire issue #761 (filed by us 2026-05-16), MultiFidelityVarianceBasedStrategy + non-box constraints
+68. BoFire issue #761 (opened 2026-05-16), MultiFidelityVarianceBasedStrategy + non-box constraints
 69. Ax 1.2.4 release notes, https://github.com/facebook/Ax/releases/tag/1.2.4
 70. Ax SEBO tracking, https://github.com/facebook/Ax/issues/3828
 71. BoTorch 0.17.0, https://github.com/pytorch/botorch/releases/tag/v0.17.0
@@ -267,7 +270,7 @@ If BoFire's `EntingStrategy` turns out to be missing a critical hook at the wrap
 77. NEXTorch, https://github.com/VlachosGroup/nextorch (unmaintained since 2021)
 78. GPflowOpt, https://github.com/GPflow/GPflowOpt (unmaintained since 2020-12)
 
-### Internal docs cross-referenced
+### Related Repository Docs
 
 79. `docs/BOFIRE_POSITIONING.md` (canonical adapter-not-destination doc, 2026-05-15)
 80. `docs/BOFIRE_CONSTRAINT_PATTERNS.md` (BoFire constraint compat matrix)

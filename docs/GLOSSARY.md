@@ -1,6 +1,6 @@
 # Glossary
 
-Short definitions of the terms a newcomer hits in the first ten minutes of working with the repo. Roughly grouped by what kind of object the term refers to.
+Short definitions for the terms used throughout this repository. The entries are grouped by object type.
 
 ## Campaign and state
 
@@ -12,7 +12,7 @@ Short definitions of the terms a newcomer hits in the first ten minutes of worki
 
 **Arm.** A self-contained set of factors, responses, and design rules within one campaign, when the campaign covers more than one scale or platform at once. The split-plot fed-batch and multi-arm scale-transfer demos both use arms. Arms live in `campaign_arms[]`.
 
-**First batch, follow-up batch, internal wave labels.** A "wave" is the repo's internal checkpoint label for a batch of runs whose results are reviewed before the next action is chosen. `wave1` means the first planned batch; `wave2` means the follow-up planning packet produced after first-batch results pass QC and assay review. It is not a predetermined campaign schedule: the next action can be confirm, narrow, expand, pause, stop, or change scale. Public-facing copy should usually say "first batch," "follow-up batch," "next experiment round," or "adaptive next step" while keeping stable identifiers such as `plan-wave2` and `planned_wave2_design`.
+**First batch, follow-up batch, checkpoint labels.** A "wave" is the repo's checkpoint label for a batch of runs whose results are reviewed before the next action is chosen. `wave1` means the first planned batch; `wave2` means the follow-up planning packet produced after first-batch results pass QC and assay review. It is not a predetermined campaign schedule: the next action can be confirm, narrow, expand, pause, stop, or change scale. In prose, use "first batch," "follow-up batch," "next experiment round," or "adaptive next step"; stable identifiers such as `plan-wave2` and `planned_wave2_design` remain in commands and artifacts.
 
 ## Profiles and claims
 
@@ -20,7 +20,7 @@ Short definitions of the terms a newcomer hits in the first ten minutes of worki
 
 **Claim level.** A provenance label on every artifact that describes how rigorously it was produced. Common values: `exact` (computed exactly), `adapter_backed` (produced by a recognized adapter), `approximate` (follows the pattern, did not compute exact properties), `heuristic` (sensible structure, statistician review advised), `planned_wave2_design` (follow-up candidates from the closed-loop planner), `bayesian_optimization_planned` (BoTorch BO output), `public_synthetic_demo` (public fixture).
 
-**Readiness verdict.** Output of `ferm-doe validate`. Three colors: GREEN (ready to execute), YELLOW (planning artifact only; physical evidence or assay readiness still needed), RED (structural error or missing required block). Public demos sit at YELLOW by design.
+**Readiness verdict.** Output of `ferm-doe validate`. Three colors: GREEN (meets the declared readiness checks; separate execution review still applies), YELLOW (planning artifact with stated caveats; physical evidence or assay readiness may still be needed), RED (structural error or missing required block). Public demos sit at YELLOW by design.
 
 **Readiness axes.** The validator reports a per-axis state covering responses, factors, arms, scale_context, doe, decision_rules, evidence, and feasibility. `worst_axis` in the summary points at the axis driving the verdict.
 
@@ -34,7 +34,7 @@ Short definitions of the terms a newcomer hits in the first ten minutes of worki
 
 **Whole plot / sub-plot.** In a split-plot design, the whole plot is the block defined by hard-to-change factors; sub-plots vary the easy-to-change factors inside that block. The design CSV carries a `whole_plot_id` column so the run order honors the structure.
 
-**NChooseK constraint.** Cardinality constraint: out of `N` candidate ingredients (or factor levels), exactly `K` are active in any run, the others held at zero. Common in media composition. Stalls BoFire's `SoboStrategy` (upstream issue #450); the documented swap is ENTMOOT v2.
+**NChooseK constraint.** Cardinality constraint: out of `N` candidate ingredients or factor levels, a declared minimum and maximum number are active in any run while the rest are held at zero. It is common in media composition. For Bayesian optimization, this repository routes load-bearing NChooseK constraints through ENTMOOT or OMLT because its supported BoFire 0.3.x adapter retains a documented compatibility limit.
 
 **Mixture constraint.** All mixture components sum to a fixed total (usually 1.0 or 100 percent). Lives in the manifest as a constraint declaration; the validator checks the sum tolerance on design rows.
 
@@ -66,7 +66,7 @@ Short definitions of the terms a newcomer hits in the first ten minutes of worki
 
 ## Outputs
 
-**Run packet.** A single shippable Markdown document plus its JSON twin that stitches every available artifact together: readiness verdict, family recommendation, goals, assay-power, sampling plan, design preview, first-batch analysis, follow-up plan, risks, stop rules, assumptions. Produced by `ferm-doe finalize`.
+**Run packet.** A single review-ready planning document in Markdown plus its JSON twin that stitches every available artifact together: readiness verdict, family recommendation, goals, assay-power, sampling plan, design preview, first-batch analysis, follow-up plan, risks, stop rules, assumptions. Produced by `ferm-doe finalize`.
 
 **Dossier.** A campaign's cumulative evidence record: `CITATIONS.json`, `NOTES.md`, `SOURCES.bib`, per-corpus `EVIDENCE.csv`. Built across phases of a campaign; the structure and the per-corpus swarm / integrator / harvester roles are defined in [`SWARMS_AND_EVIDENCE.md`](SWARMS_AND_EVIDENCE.md). The dossier-generation runbook lives in [`dossier-generation.md`](dossier-generation.md).
 
@@ -86,4 +86,4 @@ Short definitions of the terms a newcomer hits in the first ten minutes of worki
 
 **Goal (Derringer-Suich desirability).** A composite objective formulated from response targets and bounds. Produced by `ferm-doe goals`. Each response gets a desirability score in [0, 1]; the campaign desirability is the geometric mean. See [`goals.py`](../src/biosymphony_ferm_doe/goals.py) for the formulation.
 
-**Tool registry.** The curated set of 47 BO/DoE and sidecar tools the repo tracks, with adapter status (adopted, evaluate_next, watch, boundary_only, avoid, compatibility_only). Lives at [`tool-registry.json`](tool-registry.json) and is summarized in [`TOOL_REGISTRY.md`](TOOL_REGISTRY.md).
+**Tool registry.** The curated set of BO/DoE and sidecar tools the repo tracks, with adapter status (adopted, evaluate_next, watch, boundary_only, avoid, compatibility_only). Lives at [`tool-registry.json`](tool-registry.json) and is summarized in [`TOOL_REGISTRY.md`](TOOL_REGISTRY.md).

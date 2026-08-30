@@ -1,6 +1,6 @@
 # ENTMOOT v2 Swap, Integration Design
 
-> **STATUS: ADAPTER DELIVERED.** In-repo wrapper at
+> **Adapter status: delivered.** In-repo wrapper at
 > `src/biosymphony_ferm_doe/adapters/entmoot_strategy.py` with 12 passing
 > tests in `tests/test_entmoot_adapter.py`. All three risks identified in
 > the original design are closed at the adapter layer:
@@ -11,9 +11,13 @@
 > The wave-2 routing layer treats ENTMOOT as the cardinality-aware
 > Bayesian optimisation route when `nchoosek` constraints are present.
 
-**Status:** Adapter delivered. Wired as the cardinality-aware BO route.
+**Status:** Adapter delivered. Wired as a cardinality-aware BO route.
 **Authored:** 2026-05-16. **Adapter delivered:** 2026-05-16.
-**Local-only repo.**
+
+Upstream issue #450 is now closed. This document preserves the behavior
+observed with BoFire 0.3.1; later BoFire tags have not been evaluated against
+this repository's adapter, so the ENTMOOT route remains conservative rather
+than evidence that current BoFire has the same limitation.
 
 ## Why this swap
 
@@ -35,7 +39,7 @@ The result of the example Phase 2 BO smoke shows the failure mode in numbers:
 | 8 | 0 | 0 |
 
 Zero of eight BO-asked candidates satisfied the cardinality constraint.
-"Artifact-execution success, planning-recommendation null result."
+The artifact run succeeded, but it produced no planning recommendation.
 
 ENTMOOT v2 encodes NChooseK as a hard MIP constraint via Pyomo
 (`entmoot/constraints.py::NChooseKConstraint`). The constraint is enforced
@@ -56,14 +60,14 @@ construction problem instead of a rejection-sampling one.
 | Binary | one-hot via `CategoricalInput` workaround | first-class: `add_feature("binary")` → Pyomo `Binary` |
 | Categorical | `CategoricalInput(categories=[...])` (one-hot inside BoTorch GP) | `add_feature("categorical", ("blue", "orange", "gray"))` → Pyomo `Binary` per category with sum=1 |
 | Linear (in)equality | `LinearInequalityConstraint.from_smaller_equal(features, coefficients, rhs)` | `LinearInequalityConstraint(feature_keys, coefficients, rhs)` → Pyomo expression `Σ c_i·x_i ≤ rhs` |
-| **NChooseK** | `NChooseKConstraint(...)`, **stalls SoboStrategy.ask()** (issue #450) | `NChooseKConstraint(feature_keys, min_count, max_count, none_also_valid)`, encoded as hard MIP with binary indicators (see §3) |
+| **NChooseK** | In the v0.3.1 audit, `NChooseKConstraint(...)` did not return from `SoboStrategy.ask()` (issue #450) | `NChooseKConstraint(feature_keys, min_count, max_count, none_also_valid)`, encoded as hard MIP with binary indicators (see §3) |
 | Multi-objective | `MoboStrategy + qLogNEHVI` | scalarized via weights tuple `(w_1, ..., w_n)`, `sum(weights) == 1.0`; Pareto sweep requires re-solving across weight grid |
 | Multi-fidelity | `MultiFidelityStrategy` (sequential, fragile) | not supported in v2.x |
 | Output shape | `pd.DataFrame` with column per factor; `candidate_count` rows | `OptResult(opt_point, obj, mu, unc, active_leaves)`, single point per `solve()` |
 | Batch q>1 | `strategy.ask(candidate_count=q)` | sequential q=1 + `enting.fit()` on placeholder-tells, OR `weights` sweep, OR `model_core` reuse with fantasy points |
 | Solver requirement | Python-only (BoTorch on torch) | Pyomo + a MIP solver. `gurobipy>=11` is listed as a hard dep in `entmoot/pyproject.toml`, but the `PyomoOptimizer(params={"solver_name": "glpk"\|"scip"\|"ipopt"})` path lets you swap to an OSS solver |
 | Determinism | seeded but BoTorch's `optimize_acqf` uses multi-start | MIP solve is deterministic given solver + tolerances; LightGBM is seeded via `rnd_seed` on `ProblemConfig` |
-| Fail modes | (a) `SoboStrategy` stalls on NChooseK; (b) `_sample_with_nchoosek` 100% CPU non-terminating; (c) `optimize_acqf` slow at q≥4; (d) silent infeasibility | (a) infeasible MIP → `opt.solve` returns infeasible status (catchable); (b) Gurobi unavailable → ImportError at `gurobipy>=11` install OR runtime `pyo.SolverFactory("gurobi").available() is False`; (c) MIP at high K + many continuous variables scales as 2^K worst-case but usually solves in seconds; (d) LightGBM cannot extrapolate outside training-data envelope, so cold-start before ~10 observations is unreliable |
+| Fail modes | In the v0.3.1 audit: (a) `SoboStrategy` did not return with NChooseK; (b) `_sample_with_nchoosek` saturated a CPU; (c) `optimize_acqf` was slow at q≥4; (d) infeasibility could be silent | (a) infeasible MIP returns an infeasible status; (b) selected solver unavailable; (c) larger MIPs may be slow; (d) LightGBM cannot extrapolate outside the training-data envelope, so cold-start behavior is unreliable |
 
 The decisive difference is the **NChooseK row**. BoFire's `SoboStrategy` cannot
 honor it; ENTMOOT bakes it into the MIP as a hard constraint that the solver

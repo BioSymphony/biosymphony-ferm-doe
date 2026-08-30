@@ -34,10 +34,10 @@ The useful check is direct: define what varies, what stays fixed, and what will 
 
 ```mermaid
 flowchart LR
-  SRC("source scale<br/>qualified · real data"):::hero --> BR{"bridge criteria<br/>kLa · P/V · tip-speed<br/>mix-time · OUR · RQ · VVM<br/>geometric similarity"}:::gate
-  BR -->|"all matched"| MATCH("Match → proceed"):::go --> TGT("target scale<br/>predicted behavior"):::proc
+  SRC("source scale<br/>qualified data or stated basis"):::hero --> BR{"bridge criteria<br/>kLa · P/V · tip-speed<br/>mix-time · OUR · RQ · VVM<br/>geometric similarity"}:::gate
+  BR -->|"all criteria met"| MATCH("Match → review"):::go --> TGT("target scale<br/>planning hypothesis"):::proc
   BR -->|"some gaps"| GAP("Gap → measure / estimate"):::gate
-  BR -->|"not qualified"| RED("Redesign → agent escalates"):::block
+  BR -->|"not qualified"| RED("Revise → review the bridge"):::block
   classDef hero fill:#1b1b18,stroke:#d9d2c0,color:#ffffff,stroke-width:1.5px;
   classDef proc fill:#fffdf8,stroke:#2b2926,color:#2b2926,stroke-width:1.5px;
   classDef gate fill:#fffdf8,stroke:#b0892f,color:#8a6a1f,stroke-width:1.5px;
@@ -47,7 +47,7 @@ flowchart LR
 
 Scale-up and scale-down decisions depend on criteria such as `kLa`, `P/V`, tip speed, mix time, DO/OUR, VVM, and geometry. The design should show what is measured, estimated, or missing before choosing the next run set.
 
-The practical output is a match, gap, or redesign call for the transfer step.
+The transfer review should record one of three outcomes: match, gap, or redesign.
 
 ## DoE Family Selection
 

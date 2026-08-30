@@ -1,32 +1,25 @@
 {
   "schema_version": 1,
   "registry_kind": "biosymphony_ferm_doe_tool_registry",
-  "generated_on": "2026-06-21",
-  "maintainer_note": "Curated repo knowledge for optional tools, sidecars, and watchlist repos. Refresh before adding dependencies, launching paid remote work, or making current-version claims. Refresh 2026-06-21 added 10 public entries from a recent-tool survey: Xopt, Trieste, TabICLv2, PEtab/libpetab, pyPESTO, Pseudobatch, .eln, GROBID, OpenAlex, and Europe PMC. The RO-Crate entry was refreshed for Workflow Run RO-Crate and ro-crate-py context. Earlier May 2026 refreshes added or elevated BoFire NChooseK, PubMed MCP, BayBe, obsidian, estim8, bletl, ProcessOptimizer, TabPFN, LLAMBO, OMLT, and ENTMOOT.",
+  "generated_on": "2026-08-30",
+  "maintainer_note": "Curated public reference for optional tools, sidecars, and watchlist repositories. The 2026-08-30 alignment added the shipped SciPy and Plotly integrations. Refresh upstream facts before changing dependencies or making version, activity, deprecation, or archival claims.",
   "refresh_policy": {
     "default_refresh_days": 90,
     "refresh_before": [
       "adding or changing optional dependencies",
-      "launching a paid RunPod smoke that installs a tool",
+      "running a live optional-tool smoke",
       "claiming a package is current, active, deprecated, or archived",
       "turning a watchlist or sidecar tool into an adapter"
     ]
   },
   "source_notes": [
-    "logs/2026-05-15-open-source-doe-adaptive-library-survey.md",
     "docs/open-source-bioprocess-tool-survey-2026-05-15.md",
-    "logs/2026-05-15-open-tooling-survey.md",
     "docs/BOFIRE_POSITIONING.md",
     "pyproject.toml",
-    "",
     "docs/ENTMOOT_SWAP_DESIGN.md",
     "docs/BOFIRE_CONSTRAINT_PATTERNS.md",
     "src/biosymphony_ferm_doe/adapters/pubmed_mcp.py",
     "docs/research/bo-tools-survey-2026-05-16.md",
-    ".runtime/research-swarm/bo-tools-2026/EVIDENCE/llm-and-foundation-bo.md",
-    ".runtime/research-swarm/bo-tools-2026/EVIDENCE/constrained-bo-2024-2026.md",
-    ".runtime/research-swarm/bo-tools-2026/EVIDENCE/bioprocess-bo-2024-2026.md",
-    ".runtime/research-swarm/bo-tools-2026/EVIDENCE/bo-framework-landscape-2026.md",
     "docs/research/tool-registry-refresh-2026-06-21.md"
   ],
   "decision_rules": [
@@ -44,7 +37,7 @@
     },
     {
       "rule_id": "no_platform_pileup",
-      "description": "Do not add workflow platforms that duplicate Symphony/Linear unless repeated computational DAGs justify another workflow language."
+      "description": "Do not add workflow platforms that duplicate the campaign manifest and task-request contracts unless repeated computational DAGs justify another workflow language."
     }
   ],
   "tools": [
@@ -66,11 +59,19 @@
         "docs/BOFIRE_POSITIONING.md",
         "docs/BOFIRE_CONSTRAINT_PATTERNS.md"
       ],
-      "last_checked": "2026-05-16",
-      "current_signal": "GitHub active in May 2026; PyPI 0.3.1 was the compatible release inspected for current adapter symbols. audit (2026-05-16) confirmed BoFire 0.3.1 + main-branch constraint-strategy compatibility matrix; see docs/BOFIRE_CONSTRAINT_PATTERNS.md. A 2026-05-30 correction routes first-batch NChooseK DoE screens to BoFire main / PR #752 via the adaptive-nchoosek-doe extra until that support lands in a tagged release. For NChooseK BO, issue #450 remains the routing blocker for SoboStrategy; use OMLT or ENTMOOT.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.5.0",
+      "upstream_released_on": "2026-08-11",
+      "current_signal": "PyPI 0.5.0 is current upstream. The primary adapter remains on bofire>=0.3.1,<0.4 because later releases require Python 3.11 or newer and carry breaking API and dependency changes. BoFire 0.4 tagged generalized NChooseK DoE support; the separate adaptive-nchoosek-doe extra pins 0.4.1 as an unverified candidate.",
       "fit": "Constrained media optimization, mixed spaces, multi-objective BO, and future scale-fidelity planning.",
-      "risks": "Heavy Torch/BoTorch stack; pre-1.0 API; fermentation phase/feed semantics remain BioSymphony-owned. found NChooseK + SoboStrategy combination stalls indefinitely on.ask(upstream issue #450); use DoEStrategy+IPOPT or enforce cardinality post-hoc for BO. MultiFidelityVarianceBasedStrategy throws ConstraintNotFulfilledError on.askwith non-box constraints (issue #761 filed 2026-05-16).",
+      "risks": "Heavy Torch/BoTorch stack; pre-1.0 API; fermentation phase and feed semantics remain BioSymphony-owned. The 0.3.1 audit found failures for SoboStrategy with NChooseK and multi-fidelity strategies with non-box constraints. The related upstream issues are closed, but later tags have not been retested here; retain OMLT, ENTMOOT, and parallel-arm fallbacks.",
       "route": [
+        "non_box_constraints",
+        "multi_objective_responses",
+        "scale_fidelity_structure",
+        "operator_requested_bofire"
+      ],
+      "route_reasons": [
         "non_box_constraints",
         "multi_objective_responses",
         "scale_fidelity_structure",
@@ -87,7 +88,7 @@
       "category": "classical_doe",
       "priority": "P1",
       "status": "watch",
-      "posture": "lightweight DOE-family backend resumed at v1.0.x after pyDOE3 archival",
+      "posture": "current lightweight DOE-family backend to evaluate against the shipped pyDOE3 adapter",
       "package": "pydoe>=1.0.1",
       "pyproject_extra": "",
       "license": "BSD-3-Clause",
@@ -95,8 +96,10 @@
         "pypi": "https://pypi.org/project/pyDOE/",
         "docs": "https://pydoe.github.io/pydoe/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Current pydoe package had 2026 release signal; the public package currently ships the pyDOE3 fork via the pydoe3 extra.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.5.0",
+      "upstream_released_on": "2026-08-20",
+      "current_signal": "PyPI 1.5.0 is current upstream. This repository still ships its classical-design compatibility adapter through the pydoe3 extra.",
       "fit": "Plackett-Burman, factorial, RSM, and Latin-hypercube style fast paths.",
       "risks": "No bioprocess constraints, adaptive posterior, or scale-bridge semantics.",
       "route": [
@@ -121,10 +124,12 @@
         "pypi": "https://pypi.org/project/pyDOE3/",
         "docs": "https://pydoe3.readthedocs.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "PyPI 1.6.2 checked; docs say active development has moved back to pyDOE, so keep this as compatibility-only.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.6.2",
+      "upstream_released_on": "2026-01-12",
+      "current_signal": "PyPI 1.6.2 is current upstream. The compatibility-only status describes this repository's existing adapter route, not the upstream project's maintenance status.",
       "fit": "Existing pyDOE3-specific adapter for larger Box-Behnken coverage and maximin Latin-hypercube generation.",
-      "risks": "Documentation says pyDOE3 is no longer actively maintained; do not make it the primary current DOE dependency.",
+      "risks": "The adapter covers a narrow subset of pyDOE3. Evaluate current pydoe before adding new classical-design dependency surface.",
       "route": [
         "extended_box_behnken",
         "latin_hypercube_maximin",
@@ -132,6 +137,34 @@
       ],
       "claim_level": "compatibility_adapter",
       "fail_closed_behavior": "Report pyDOE3 missing and use pydoe or stdlib design family where available."
+    },
+    {
+      "tool_id": "scipy",
+      "name": "SciPy",
+      "category": "statistical_analysis",
+      "priority": "P0",
+      "status": "adopted_optional",
+      "posture": "optional statistical and quasi-random design adapter",
+      "package": "scipy>=1.11",
+      "pyproject_extra": "scipy",
+      "license": "BSD-3-Clause",
+      "links": {
+        "repo": "https://github.com/scipy/scipy",
+        "docs": "https://docs.scipy.org/doc/scipy/"
+      },
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.18.1",
+      "upstream_released_on": "2026-08-21",
+      "current_signal": "PyPI 1.18.1 is current upstream and requires Python 3.12 or newer. The repository retains scipy>=1.11 for its wider Python support and uses scipy.stats and scipy.stats.qmc through optional paths.",
+      "fit": "Small-sample p-values, power quantiles, and quasi-random space-filling designs.",
+      "risks": "SciPy improves statistical calculations and design generation but does not validate assay quality or campaign conclusions.",
+      "route": [
+        "analysis_pvalues",
+        "doe_power_quantiles",
+        "qmc_space_filling"
+      ],
+      "claim_level": "adapter_backed_statistical_analysis",
+      "fail_closed_behavior": "Use stdlib distribution approximations and space-filling generators when SciPy is absent."
     },
     {
       "tool_id": "salib",
@@ -147,9 +180,11 @@
         "repo": "https://github.com/SALib/SALib",
         "docs": "https://salib.readthedocs.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Active 2026 repository signal; PyPI 1.5.2 checked in the survey.",
-      "fit": "Sobol/Morris/FAST-style sensitivity, factor prioritization, and assumption attack.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.5.2",
+      "upstream_released_on": "2025-10-12",
+      "current_signal": "PyPI 1.5.2 remains current upstream.",
+      "fit": "PAWN, delta, and Sobol sensitivity analysis for factor prioritization and assumption checks.",
       "risks": "Not an optimizer; precision depends on declared ranges and response models.",
       "route": [
         "sensitivity_screening",
@@ -171,10 +206,12 @@
       "license": "MIT",
       "links": {
         "repo": "https://github.com/frictionlessdata/frictionless-py",
-        "docs": "https://frictionlessdata.io/"
+        "docs": "https://framework.frictionlessdata.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Recommended as a table-schema contract spine in the tooling survey.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "5.19.0",
+      "upstream_released_on": "2026-04-13",
+      "current_signal": "PyPI 5.19.0 is current upstream. The stdlib validator remains the default runtime path.",
       "fit": "CSV/table contracts for ledgers, evidence tables, result templates, inventories, and run sheets.",
       "risks": "Table-shape validation is not scientific semantics.",
       "route": [
@@ -182,6 +219,34 @@
       ],
       "claim_level": "contract_validation",
       "fail_closed_behavior": "Stdlib table_contracts validator remains authoritative when the package is absent."
+    },
+    {
+      "tool_id": "plotly",
+      "name": "Plotly.py",
+      "category": "reporting",
+      "priority": "P1",
+      "status": "adopted_optional",
+      "posture": "optional interactive charts for the BoFire HTML report",
+      "package": "plotly>=6.0",
+      "pyproject_extra": "report",
+      "license": "MIT",
+      "links": {
+        "repo": "https://github.com/plotly/plotly.py",
+        "docs": "https://plotly.com/python/"
+      },
+      "last_checked": "2026-08-30",
+      "upstream_version": "7.0.0",
+      "upstream_released_on": "2026-08-25",
+      "current_signal": "PyPI 7.0.0 is current upstream. The public reporter uses Plotly for feasibility slices, candidate cost stacks, and factor-coverage heatmaps.",
+      "fit": "Interactive charts in standalone BoFire HTML reports.",
+      "risks": "Embedded JavaScript increases report size; the tabular report remains authoritative.",
+      "route": [
+        "bofire_html_constraint_slice",
+        "bofire_html_cost_stack",
+        "bofire_html_factor_heatmap"
+      ],
+      "claim_level": "optional_report_visualization",
+      "fail_closed_behavior": "Omit Plotly sections and preserve the stdlib tabular report when Plotly is absent."
     },
     {
       "tool_id": "ro_crate",
@@ -200,8 +265,10 @@
         "rocrate_py": "https://github.com/ResearchObject/ro-crate-py",
         "validator": "https://github.com/crs4/rocrate-validator"
       },
-      "last_checked": "2026-06-21",
-      "current_signal": "Existing public dossier envelope refreshed against Workflow Run RO-Crate, ro-crate-py, and rocrate-validator. Keep the current stdlib metadata writer as authoritative unless a profile-aware validator is explicitly adopted.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.3.0 spec; 0.15.1 rocrate",
+      "upstream_released_on": "2026-07-10",
+      "current_signal": "RO-Crate 1.3.0 and rocrate 0.15.1 are current upstream references. Keep the repository's stdlib metadata writer authoritative unless a profile-aware validator is adopted and tested.",
       "fit": "Dossier metadata, file inventory, hashes, source refs, license, claim boundaries, and future workflow-run provenance.",
       "risks": "JSON-LD can become overbuilt; validator and package APIs add churn. Keep a minimal crate profile and treat profile-aware validation as optional.",
       "route": [
@@ -228,7 +295,7 @@
         "ro_crate_use_case": "https://www.researchobject.org/ro-crate/eln"
       },
       "last_checked": "2026-06-21",
-      "current_signal": "Research-agent survey found active consortium discussion in April-June 2026; the format is a zip-based interchange convention for ELN exports and imports.",
+      "current_signal": "The public survey recorded active consortium work in April-June 2026. The format is a zip-based interchange convention for ELN exports and imports.",
       "fit": "Public-safe synthetic run packets, sample tables, and dossier exports that should move across ELN/LIMS tools without encoding private tracker details.",
       "risks": "Import behavior varies across ELNs and the format still carries implementation quirks; do not claim validated ELN compatibility without round-trip fixture tests.",
       "route": [
@@ -254,8 +321,10 @@
         "docs": "https://grobid.readthedocs.io/",
         "releases": "https://github.com/grobidOrg/grobid/releases"
       },
-      "last_checked": "2026-06-21",
-      "current_signal": "GROBID 0.9.0 released 2026-04-07 with expanded full-text, figure, table, equation, URL, ORCID, and Docker support.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.9.1",
+      "upstream_released_on": "2026-08-04",
+      "current_signal": "GROBID 0.9.1 is the current tagged release.",
       "fit": "Convert public or open-license PDFs into structured TEI/BibTeX/citation-context inputs for dossier evidence tables.",
       "risks": "Java/Docker service surface; copyright boundaries are source-specific. Do not ingest paywalled or non-permitted full text into public fixtures.",
       "route": [
@@ -282,7 +351,7 @@
         "paper": "https://arxiv.org/abs/2205.01833"
       },
       "last_checked": "2026-06-21",
-      "current_signal": "Research-agent survey found openalex-official 0.3.3 released 2026-03-18; API access and free-tier limits changed in 2026.",
+      "current_signal": "PyPI openalex-official 0.3.3 was released 2026-03-18; API access and free-tier limits changed in 2026.",
       "fit": "Citation graph, topic, institution, and source metadata context beyond PubMed when building public literature dossiers.",
       "risks": "API keys and billing/rate limits must stay outside repos and fixtures; metadata breadth does not imply source quality or full-text rights.",
       "route": [
@@ -326,15 +395,17 @@
       "priority": "P0",
       "status": "adopted_optional",
       "posture": "repo task lane runner",
-      "package": "nox>=2026.4.10",
+      "package": "nox>=2024.4",
       "pyproject_extra": "dev",
       "license": "Apache-2.0",
       "links": {
         "repo": "https://github.com/wntrblm/nox",
         "docs": "https://nox.thea.codes/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Selected for Python-native local, optional, release, and RunPod-smoke lanes.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "2026.8.17",
+      "upstream_released_on": "2026-08-18",
+      "current_signal": "PyPI 2026.8.17 is current upstream. The repository retains nox>=2024.4 as its supported development-tool floor.",
       "fit": "Stable command surface for unit, table_contracts, dossier_smoke, adaptive_smoke, adaptive_live, and release checks.",
       "risks": "Not an environment lock by itself.",
       "route": [
@@ -358,14 +429,17 @@
         "repo": "https://github.com/meta-pytorch/botorch",
         "docs": "https://botorch.org/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Active May 2026; used directly only for intentionally narrow expert adapters.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.18.1",
+      "upstream_released_on": "2026-06-08",
+      "current_signal": "PyPI 0.18.1 is current upstream and requires Python 3.11 or newer. The repository keeps a broad lower bound for its narrow optional adapter and does not claim untested latest-version compatibility.",
       "fit": "Custom acquisition experiments when BoFire abstractions block a needed route.",
       "risks": "Too low-level for campaign-facing contracts and easy to overfit into research code.",
       "route": [
         "experimental_adaptive_adapter"
       ],
       "claim_level": "experimental_adapter",
+      "runtime_claim_level": "bayesian_optimization_planned",
       "fail_closed_behavior": "Prefer BoFire; if direct BoTorch route fails, write route report and fall back."
     },
     {
@@ -383,8 +457,10 @@
         "docs": "https://xopt.xopt.org/",
         "pypi": "https://pypi.org/project/xopt/"
       },
-      "last_checked": "2026-06-21",
-      "current_signal": "PyPI xopt 3.1.1 released 2026-06-17; docs describe constrained, serial, parallel, and multi-objective Bayesian optimization plus evolutionary methods for arbitrary simulations and control systems.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "3.2.1",
+      "upstream_released_on": "2026-07-31",
+      "current_signal": "PyPI 3.2.1 is current upstream. Official docs describe constrained, serial, parallel, and multi-objective Bayesian optimization plus evolutionary methods for arbitrary simulations and control systems.",
       "fit": "Candidate comparison backend for constrained media fixtures, scale-bridge simulations, and arbitrary expensive objective loops when manifest boundaries are preserved.",
       "risks": "Accelerator/control-systems origin; BioSymphony must own assay readiness, constraint translation, cost/scale semantics, and candidate-table validation.",
       "route": [
@@ -411,8 +487,10 @@
         "docs": "https://secondmind-labs.github.io/trieste/",
         "pypi": "https://pypi.org/project/trieste/"
       },
-      "last_checked": "2026-06-21",
-      "current_signal": "PyPI trieste 4.6.0 released 2026-06-17; public docs describe ask-tell, batch, asynchronous, constrained, multi-fidelity, and multi-objective BO.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "4.6.0",
+      "upstream_released_on": "2026-06-17",
+      "current_signal": "PyPI 4.6.0 remains current upstream. Public docs describe ask-tell, batch, asynchronous, constrained, multi-fidelity, and multi-objective BO.",
       "fit": "Useful landscape comparison for complex follow-up planning and acquisition-function research, especially when TensorFlow/GPflow is already present in an external evaluation lane.",
       "risks": "Heavy TensorFlow/GPflow stack and no fermentation-specific semantics; not a near-term public adapter unless a fixture demonstrates a route that BoFire/BayBE/Ax do not cover.",
       "route": [
@@ -436,8 +514,10 @@
       "links": {
         "docs": "https://pymoo.org/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Active enough in 2026 survey; rich constrained and mixed-variable multi-objective algorithms.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.6.2",
+      "upstream_released_on": "2026-06-28",
+      "current_signal": "PyPI 0.6.2 is current upstream and provides constrained and mixed-variable multi-objective algorithms.",
       "fit": "Posthoc Pareto sorting, hypervolume diagnostics, and design-tournament scoring.",
       "risks": "Evolutionary optimizer rather than Bayesian sample-efficient planning; use for diagnostics, not as the primary refinement loop.",
       "route": [
@@ -461,8 +541,10 @@
         "repo": "https://github.com/SMTorg/smt",
         "docs": "https://smt.readthedocs.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Active May 2026; PyPI 2.14.0 checked in survey.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "2.14.1",
+      "upstream_released_on": "2026-06-22",
+      "current_signal": "PyPI 2.14.1 is current upstream.",
       "fit": "Co-kriging and multi-fidelity surrogate diagnostics for plate/flask/reactor bridges.",
       "risks": "Surrogate toolbox, not campaign optimizer; requires careful adapter design.",
       "route": [
@@ -484,8 +566,9 @@
       "links": {
         "docs": "https://pyomo.readthedocs.io/en/stable/explanation/modeling/dae.html"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Recommended for dynamic fed-batch/feed-control feasibility checks.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "Pyomo 6.10.1",
+      "current_signal": "Pyomo 6.10.1 is current upstream. Pyomo.DAE remains a candidate sidecar for dynamic fed-batch and feed-control feasibility models.",
       "fit": "Continuous feed profile optimization, volume/substrate/oxygen constraints, and dynamic feasibility.",
       "risks": "Solver stack and initialization can become site-specific and heavy.",
       "route": [
@@ -508,8 +591,9 @@
       "links": {
         "docs": "https://pyplate-hte.readthedocs.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Relevant to high-throughput chemistry and biology experiment design/execution.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.4.7",
+      "current_signal": "PyPI 0.4.7 remains the latest release; the upstream repository has newer activity. Keep as an evaluation candidate for high-throughput experiment representation.",
       "fit": "Plate recipe exports, well-volume checks, reagent transforms, and liquid-handling artifacts.",
       "risks": "Plate-centric; not a fermentation scale-bridge model.",
       "route": [
@@ -533,8 +617,9 @@
         "repo": "https://github.com/julibeg/FedBatchDesigner",
         "paper": "https://pubs.acs.org/doi/abs/10.1021/acssynbio.5c00357"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "Per docs/research/bo-tools-survey-2026-05-16.md: Publication snapshot release 2025-07-11 added pre-loaded E. coli and S. cerevisiae parameters and three case studies (valine, ethanol, mevalonic acid). Stack is Shiny for Python + Plotly. Repo activity remains low (5 stars / 1 fork as of 2026-05) but tied to ACS Synth. Biol. publication (DOI 10.1021/acssynbio.5c00357). Supports constant and exponential feeding; growth-arrested production stage modeling; CSV/PNG export; Jupyter notebooks for parameter fitting per case study.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "snapshot-20250711",
+      "current_signal": "The 2025-07-11 publication snapshot remains the latest tagged release. It provides constant and exponential feeding models, case-study notebooks, and CSV or image export.",
       "fit": "Feed-volume/time stage math and growth-arrested fed-batch planning references.",
       "risks": "Low adoption signal; may not cover ordinary microbial or mammalian fed-batch oxygen limits.",
       "route": [
@@ -557,8 +642,9 @@
         "repo": "https://github.com/BioSTEAMDevelopmentGroup/biosteam",
         "docs": "https://biosteam.readthedocs.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Bioprocess and TEA/LCA package relevant to fermentation-derived product economics.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "2.53.11",
+      "current_signal": "PyPI 2.53.11 is current and the upstream repository remains active. BioSTEAM stays an evaluation candidate for process-economic and life-cycle sidecars, not a core DoE planner.",
       "fit": "Cost/L, downstream context, feedstock/media cost projections, TEA/LCA examples.",
       "risks": "Biorefinery scope can distract from upstream executability.",
       "route": [
@@ -583,8 +669,9 @@
         "tellurium": "https://github.com/sys-bio/tellurium",
         "amici": "https://pypi.org/project/amici/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Recommended for mechanistic model sidecars, sensitivity, and parameter-estimation interchange.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "libRoadRunner 2.10.0; Tellurium 2.2.11.2; AMICI 1.0.1",
+      "current_signal": "Current tagged components are libRoadRunner 2.10.0, Tellurium 2.2.11.2, and AMICI 1.0.1. Keep this stack as a mechanistic-model and parameter-estimation sidecar candidate.",
       "fit": "Growth/substrate/product kinetics, parameter tables, event/feed schedules, and model provenance.",
       "risks": "Public SBML models rarely encode full vessel/feed/oxygen-transfer semantics.",
       "route": [
@@ -608,8 +695,10 @@
         "docs": "https://petab.readthedocs.io/",
         "pypi": "https://pypi.org/project/petab/"
       },
-      "last_checked": "2026-06-21",
-      "current_signal": "PyPI petab 0.8.2 released 2026-03-12; package reads, writes, and validates PEtab files and installs the petablint validator.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.8.2",
+      "upstream_released_on": "2026-03-12",
+      "current_signal": "PyPI 0.8.2 remains current upstream. The package reads, writes, and validates PEtab files and installs the petablint validator.",
       "fit": "Portable public calibration fixtures around SBML/ODE models before pyPESTO, AMICI, or RoadRunner-side evaluation.",
       "risks": "Systems-biology parameter-estimation semantics are not fermentation manifest semantics; keep response, factor, assay, cost, and scale contracts BioSymphony-owned.",
       "route": [
@@ -636,8 +725,10 @@
         "pypi": "https://pypi.org/project/pypesto/",
         "paper": "https://doi.org/10.1093/bioinformatics/btad711"
       },
-      "last_checked": "2026-06-21",
-      "current_signal": "PyPI pypesto 0.6.0 released 2026-03-19; docs describe multi-start and global optimization, AMICI/RoadRunner/JAX/Julia simulator interfaces, PEtab/SBML pipelines, and uncertainty quantification.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.6.0",
+      "upstream_released_on": "2026-03-19",
+      "current_signal": "PyPI 0.6.0 remains current upstream. Official docs describe multi-start and global optimization, simulator interfaces, PEtab/SBML pipelines, and uncertainty quantification.",
       "fit": "Candidate calibration sidecar for public or synthetic kinetic and cell-culture models, with uncertainty reports that can feed evidence and assumption checks.",
       "risks": "Heavy optional stack and calibration outputs can look more authoritative than the available data supports; never bypass readiness, assay-power, scale, or claim-boundary checks.",
       "route": [
@@ -689,9 +780,10 @@
       "links": {
         "repo": "https://github.com/prefix-dev/pixi"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Useful if optional dependency lanes multiply beyond simple venv/Nox handling.",
-      "fit": "Named environments for stdlib, contracts, adaptive, release, and RunPod smoke profiles.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.78.0",
+      "current_signal": "Pixi 0.78.0 is current upstream. It remains a watch item for reproducible optional dependency lanes if the current venv and Nox approach becomes insufficient.",
+      "fit": "Named environments for stdlib, contracts, adaptive, release, and optional-tool smoke profiles.",
       "risks": "Adds another environment manager.",
       "route": [
         "dependency_locking"
@@ -702,10 +794,10 @@
     {
       "tool_id": "cwl",
       "name": "Common Workflow Language / cwltool provenance",
-      "category": "remote_handoff",
+      "category": "portable_handoff",
       "priority": "P1",
       "status": "watch",
-      "posture": "portable provider handoff candidate",
+      "posture": "portable workflow handoff candidate",
       "package": "",
       "pyproject_extra": "",
       "license": "Apache-2.0",
@@ -713,15 +805,16 @@
         "docs": "https://www.commonwl.org/",
         "provenance": "https://cwltool.readthedocs.io/en/latest/CWLProv.html"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Useful only when RunPod handoff commands need portable declared inputs and outputs.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "cwltool 3.2.20260720092025",
+      "current_signal": "CWL and CWLProv remain active; cwltool 3.2.20260720092025 is current. Keep as a watch item for portable declared inputs, outputs, and workflow provenance.",
       "fit": "Narrow remote execution bundles with explicit command provenance.",
-      "risks": "Verbose for simple scripts; not a replacement for Symphony orchestration.",
+      "risks": "Verbose for simple scripts and unnecessary while the manifest and task-request contracts remain sufficient.",
       "route": [
-        "provider_handoff_bundle"
+        "portable_handoff_bundle"
       ],
       "claim_level": "workflow_provenance_sidecar",
-      "fail_closed_behavior": "Use Nox plus explicit JSON provider handoff."
+      "fail_closed_behavior": "Use Nox plus the explicit JSON handoff contracts."
     },
     {
       "tool_id": "dwsim",
@@ -737,8 +830,9 @@
         "site": "https://dwsim.org/",
         "repo": "https://github.com/DanWBR/dwsim"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Relevant broad process simulator but GPL and heavy runtime.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "9.0.5",
+      "current_signal": "DWSIM 9.0.5 is the latest tagged release. The linked GitHub repository is archived; GPL licensing and the heavy runtime keep it boundary-only.",
       "fit": "Downstream, biorefinery, and process-economics reference simulations.",
       "risks": "GPL embedding risk and GUI/heavy runtime.",
       "route": [
@@ -760,8 +854,9 @@
       "links": {
         "repo": "https://github.com/cadet"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Useful for downstream unit-operation modeling; not a core upstream DoE planner.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "CADET-Core 5.1.1",
+      "current_signal": "CADET-Core 5.1.1 is current upstream. CADET remains relevant to downstream unit-operation modeling and outside the core upstream DoE planner.",
       "fit": "Chromatography/filtration sidecars when dossiers grow downstream.",
       "risks": "GPL embedding risk and uncertain upstream fermentation fit.",
       "route": [
@@ -784,8 +879,9 @@
         "repo": "https://github.com/opencobra/cobrapy",
         "docs": "https://cobrapy.readthedocs.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Constraint-based metabolic modeling package; useful only if strain/model priors enter evidence layer.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.32.1",
+      "current_signal": "COBRApy 0.32.1 is current upstream. Keep it boundary-only unless public metabolic-model priors enter the evidence layer.",
       "fit": "Substrate/product feasibility priors and yield-bound sanity checks.",
       "risks": "GEM predictions are not process readiness; GPL and model-license variance.",
       "route": [
@@ -807,15 +903,16 @@
       "links": {
         "docs": "https://snakemake.github.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Strong scientific workflow engine but not needed for current contract/dossier orchestration.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "9.26.1",
+      "current_signal": "Snakemake 9.26.1 is current upstream. It remains a capable workflow engine that is not needed for the repository's current contract and dossier flow.",
       "fit": "Benchmark sweeps or repeated simulation campaigns.",
       "risks": "Another DSL and execution model competing with existing orchestration.",
       "route": [
         "batch_benchmark_dag"
       ],
       "claim_level": "workflow_sidecar",
-      "fail_closed_behavior": "Keep Symphony/Linear and Nox lanes."
+      "fail_closed_behavior": "Keep the manifest, task-request, and Nox lanes."
     },
     {
       "tool_id": "nextflow",
@@ -830,15 +927,16 @@
       "links": {
         "docs": "https://www.nextflow.io/"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Excellent for scalable containerized pipelines; overkill for this repo today.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "26.04.6",
+      "current_signal": "Nextflow 26.04.6 is the latest tagged release. Keep it as a watch item for larger containerized pipelines rather than adding a second workflow language now.",
       "fit": "Large computational analysis pipelines.",
       "risks": "Groovy DSL and cloud-pipeline posture do not align with current Python/stdlib repo shape.",
       "route": [
         "large_compute_pipeline"
       ],
       "claim_level": "workflow_sidecar",
-      "fail_closed_behavior": "Keep Symphony/Linear and Nox lanes."
+      "fail_closed_behavior": "Keep the manifest, task-request, and Nox lanes."
     },
     {
       "tool_id": "scikit_optimize",
@@ -853,8 +951,9 @@
       "links": {
         "repo": "https://github.com/scikit-optimize/scikit-optimize"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Original repository archived in 2024; stale relative to current scientific Python stack. Maintained continuation: ProcessOptimizer (Novo Nordisk Research, BSD-3, J. Chem. Inf. Model. 2025) \u2014 see tool_id 'processoptimizer'.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.10.2",
+      "current_signal": "PyPI 0.10.2 remains the latest release and the original repository remains archived. Use the separately tracked ProcessOptimizer continuation for any new evaluation.",
       "fit": "None for new integration.",
       "risks": "Stale dependency and limited fit for constrained multi-objective scale-bridge work.",
       "route": [],
@@ -874,8 +973,9 @@
       "links": {
         "repo": "https://github.com/anyoptimization/pysamoo"
       },
-      "last_checked": "2026-05-15",
-      "current_signal": "Potentially interesting surrogate-assisted multi-objective extension but AGPL posture is unsuitable by default.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.1.2",
+      "current_signal": "PyPI 0.1.2 remains current while the repository has newer activity. The AGPL license keeps this surrogate-assisted multi-objective tool outside the adopted adapter set.",
       "fit": "None for current repo.",
       "risks": "AGPL distribution obligations.",
       "route": [],
@@ -901,8 +1001,10 @@
         "src/biosymphony_ferm_doe/adapters/entmoot_strategy.py",
         "tests/test_entmoot_adapter.py"
       ],
-      "last_checked": "2026-05-23",
-      "current_signal": "Public adapter includes adapter-side min_count emission, min-active lower coupling for NChooseK indicators, HiGHS default solver support, and tie-cycle handling. Unit tests cover routed/not-available reports and strictly positive min-active amount calculation without requiring ENTMOOT at import time.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "2.1.1",
+      "upstream_released_on": "2026-02-19",
+      "current_signal": "PyPI 2.1.1 remains current upstream. The public adapter adds min_count emission, min-active lower coupling, HiGHS solver support, and tie-cycle handling at the repository boundary.",
       "fit": "MIP-encoded NChooseK cardinality first-class; addresses BoFire NChooseK+SoboStrategy stall (issue #450). In-repo adapter exposes adapter_backed_nchoosek BO route with HiGHS default solver.",
       "risks": "Raw upstream ENTMOOT APIs can still mislead if used directly; use the in-repo adapter so min_count, min-active coupling, solver fallback, and fail-closed route reports are preserved.",
       "route": [
@@ -911,6 +1013,12 @@
         "in_repo_adapter"
       ],
       "claim_level": "adapter_backed_nchoosek_bo",
+      "runtime_claim_level": "entmoot_adapter_planning",
+      "route_reasons": [
+        "nchoosek_constraint_with_bo",
+        "tree_surrogate_requested",
+        "bofire_sobo_known_stall"
+      ],
       "fail_closed_behavior": "Adapter raises RuntimeError at instantiation if entmoot or chosen solver not available; degrades to \"not_available\" in plan reports without raising."
     },
     {
@@ -931,15 +1039,15 @@
         "src/biosymphony_ferm_doe/adapters/pubmed_mcp.py",
         "tests/test_pubmed_adapter.py"
       ],
-      "last_checked": "2026-05-16",
-      "current_signal": "Unit tests green for fixture-mode normalization and fallback behavior; harness-mediated PubMed harvest is the live-enrichment path (operator runs PubMed search via their coding-agent harness, hands records to the adapter through the fixture interface). Direct in-process MCP calls are not wired in the adapter; the harvest path runs out-of-band.",
+      "last_checked": "2026-08-30",
+      "current_signal": "The in-repo adapter supports fixture normalization and fallback behavior. Direct in-process MCP calls remain unwired; live retrieval must be performed by the calling harness and handed to the fixture interface.",
       "fit": "Fixture-driven PubMed citation enrichment, dossier BibTeX export, --use-pubmed-fixture CLI flag for deterministic test mode. A direct in-process MCP hook is reserved (_try_mcp_fetch).",
       "risks": "Direct MCP mode is currently a stub; the practical path for live enrichment is harness-mediated harvest plus fixture handoff. Fixture mode required for offline/CI runs.",
       "route": [
         "dossier_citation_enrichment",
         "bibtex_export"
       ],
-      "claim_level": "live_citation_enrichment",
+      "claim_level": "fixture_normalization_and_harness_mediated_enrichment",
       "fail_closed_behavior": "When MCP unreachable, adapter falls back to fixture mode or empty enrichment with explicit warning."
     },
     {
@@ -960,10 +1068,12 @@
         "docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md",
         "docs/adaptive-backend-evaluation.json"
       ],
-      "last_checked": "2026-05-23",
-      "current_signal": "PyPI ax-platform 1.2.4 verified 2026-05-23; MIT license. Position is infrastructure/custom-modeling pilot only: trial lifecycle, generation strategies, storage/resume, and BoTorch-backed custom paths. Not a replacement for BioSymphony campaign manifest, readiness gates, or lab handoff packet.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.3.1",
+      "upstream_released_on": "2026-06-09",
+      "current_signal": "PyPI 1.3.1 is current upstream and requires Python 3.11 or newer. The backend-eval extra remains pinned to 1.2.4, so this entry does not claim latest-version compatibility.",
       "fit": "Production adaptive-experiment orchestration, custom GenerationStrategy/BoTorch routing, trial lifecycle and resume semantics when a campaign outgrows a simple ask/tell adapter.",
-      "risks": "Heavier translation surface than BoFire/BayBE; not chemistry-first or bioprocess-first; can duplicate Symphony/Linear orchestration if adopted too early.",
+      "risks": "Heavier translation surface than BoFire or BayBE; not chemistry-first or bioprocess-first; can duplicate campaign orchestration if adopted too early.",
       "route": [
         "adaptive_orchestration_pilot",
         "custom_generation_strategy",
@@ -984,11 +1094,13 @@
       "pyproject_extra": "",
       "license": "MIT",
       "links": {
-        "repo": "https://github.com/pytorch/botorch",
+        "repo": "https://github.com/meta-pytorch/botorch",
         "docs": "https://botorch.org/"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "Per docs/research/bo-tools-survey-2026-05-16.md: BoTorch direct is the only path for true cost-aware BO. BoFire has no ExpectedImprovementWithCost; Ax exposes only via BoTorch passthrough. Recommendation is a sibling adapter (adapters/botorch_cost_aware.py) when manifest declares responses with cost as a primary direction \u2014 NOT a displacement of the BoFire route. BoTorch 0.17.2 (Meta, 2026-03-05) ships PFN surrogates, classifier-based constraint feasibility, EI-per-cost, qLogNEHVI.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.18.1",
+      "upstream_released_on": "2026-06-08",
+      "current_signal": "PyPI 0.18.1 is current upstream. A dated repository review selected direct BoTorch as the watch path for cost-aware acquisition experiments that need lower-level surrogate control.",
       "fit": "Expected Improvement per unit cost (EIpu) for cost-aware Pareto front; direct surrogate control without BoFire constraint-translation overhead.",
       "risks": "Reimplements problem encoding from scratch; loses BoFire's data-model + factor-space scaffolding.",
       "route": [
@@ -1009,10 +1121,10 @@
       "pyproject_extra": "",
       "license": "MIT",
       "links": {
-        "repo": "https://github.com/aspuru-guzik-group/atlas"
+        "repo": "https://github.com/the-matter-lab/atlas"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "Per docs/research/bo-tools-survey-2026-05-16.md: Atlas's NChooseK support is not MIP-encoded and not exercised in upstream tutorials. Reclassified from 'NChooseK candidate' to 'unknown-feasibility candidate' \u2014 Atlas + Anubis (sibling) are best-in-class for learning a feasibility classifier from failed runs. v0.0.1 January 2025 release, 174 commits, 50 stars, Vector Institute / Acceleration Consortium maintained. Python 3.9-3.10 only.",
+      "last_checked": "2026-08-30",
+      "current_signal": "The canonical repository is now under the-matter-lab. The last reviewed release was v0.0.1; this remains a watch item for categorical and unknown-feasibility workflows.",
       "fit": "Unknown-feasibility BO via Anubis variational GP classifier. Multi-fidelity also supported. NOT a NChooseK fix \u2014 use ENTMOOT (via BoFire EntingStrategy) for cardinality.",
       "risks": "Smaller community than BoFire/BoTorch; chemistry-first not bioprocess-first.",
       "route": [
@@ -1041,10 +1153,12 @@
         "docs/adaptive-backend-evaluation.json",
         "examples/adaptive-backend-eval/README.md"
       ],
-      "last_checked": "2026-05-23",
-      "current_signal": "PyPI baybe 0.14.3 verified with Python 3.11 on 2026-05-23; requires Python >=3.10,<3.14. Public evaluation target for low-data, discrete/hybrid, transfer-learning, async, and categorical/substance workflows. Fixture use must preserve BioSymphony manifest, scale-bridge, assay, cost-stack, and handoff boundaries.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.15.0",
+      "upstream_released_on": "2026-06-11",
+      "current_signal": "PyPI 0.15.0 is current upstream and supports Python >=3.10,<3.15. The backend-eval extra remains pinned to 0.14.3 because 0.15.0 includes breaking API changes; no latest-version compatibility is claimed.",
       "fit": "Compare next to BoFire for low-data-regime design, discrete/hybrid campaign surfaces, transfer-learning across related campaigns, asynchronous result arrival, and substance/categorical encodings. Good match to cumulative-dossier learning if kept behind a manifest boundary.",
-      "risks": "Smaller classical constrained-DoE/IPOPT surface than BoFire; pre-1.0 API; Merck KGaA roadmap priorities may differ from ours; must prove it can preserve BioSymphony's manifest, scale-bridge, assay, cost-stack, and handoff boundaries.",
+      "risks": "Smaller classical constrained-DoE/IPOPT surface than BoFire and a pre-1.0 API. Any adapter must preserve the manifest, scale-bridge, assay, cost-stack, and handoff boundaries.",
       "route": [
         "bofire_alternative_adapter",
         "categorical_substance_encoding",
@@ -1070,8 +1184,9 @@
         "docs": "https://msdllcpapers.github.io/obsidian/",
         "pypi": "https://pypi.org/project/obsidian-apo/"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "v0.8.6 released 2025-03-20; 46 stars, 9 forks, 278 commits. Author: Kevin Stone, Merck & Co. Dash UI deployable via 'pip install obsidian-apo[app]'. BayesianOptimizer central object with GP+EI default, batch + parallel evaluation, SHAP integration.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.8.6",
+      "current_signal": "PyPI 0.8.6 remains the latest release and the repository remains active. The project provides GP-based Bayesian optimization, batch recommendations, and an optional application UI.",
       "fit": "Reference for Dash UI patterns and SHAP-based explainability for process development scientists. Not embeddable due to GPL-3.0.",
       "risks": "GPL-3.0 embedding risk per registry license_boundary decision rule. Closed-source corporate-affiliated maintainer (Merck & Co.).",
       "route": [
@@ -1095,10 +1210,12 @@
         "repo": "https://github.com/JuBiotech/estim8",
         "org": "https://github.com/JuBiotech"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "v0.1.5 released 2026-05-12; 4 stars, 5 watchers; six releases over two years. Active development from Forschungszentrum J\u00fclich's JuBiotech ecosystem. Parameter estimation for dynamic bioprocess models compliant with FMI (Functional Mockup Interface). scipy + pygmo optimization backends. Replicate-aware modeling and measurement noise modeling.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "0.1.6",
+      "upstream_released_on": "2026-07-13",
+      "current_signal": "PyPI 0.1.6 is current upstream. The package supports FMI-based parameter estimation for dynamic bioprocess models.",
       "fit": "First-class FMI bridge \u2014 can ingest Modelica models from external upstream model authors and run estimation in Python. Useful when a campaign sponsor brings Modelica vessel/control models.",
-      "risks": "AGPL-3.0 prohibits embedding per registry license_boundary decision rule. Academic-scale signal (4 stars). Maintenance horizon uncertain.",
+      "risks": "AGPL-3.0 prohibits embedding under the registry license boundary. Maintenance horizon remains uncertain.",
       "route": [
         "fmi_modelica_parameter_estimation",
         "external_bioprocess_model_ingest"
@@ -1120,8 +1237,9 @@
         "repo": "https://github.com/JuBiotech/bletl",
         "org": "https://github.com/JuBiotech"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "v1.7.1 released 2026-04-15; 8 stars, 2 forks, 431 commits, 29 releases. JuBiotech (Forschungszentrum J\u00fclich). BioLector I/II/Pro raw file parsing; PyMC-backed uncertainty quantification on time-variable growth rates; switch-point Bayesian inference.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.7.1",
+      "current_signal": "PyPI 1.7.1 remains current and the repository remains active. The package parses BioLector data and provides uncertainty-aware growth-rate analysis.",
       "fit": "Canonical Python ingest path for BioLector microbioreactor data. Operator runs externally; biosymphony ingests CSV output.",
       "risks": "AGPL-3.0 prohibits embedding per registry license_boundary decision rule. Previous survey did not flag the AGPL license; this entry exists to make the boundary explicit.",
       "route": [
@@ -1144,8 +1262,10 @@
         "repo": "https://github.com/novonordisk-research/ProcessOptimizer",
         "paper": "https://pubs.acs.org/doi/10.1021/acs.jcim.4c02240"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "Pharma-affiliated maintainer (Novo Nordisk Research). J. Chem. Inf. Model. 2025 publication (DOI 10.1021/acs.jcim.4c02240). Bayesian optimization with GP surrogates, multi-objective, batch mode, noise add/remove, comprehensive plotting. Active fork of archived scikit-optimize.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.1.2",
+      "upstream_released_on": "2026-02-13",
+      "current_signal": "PyPI 1.1.2 is current upstream. The maintained scikit-optimize lineage provides Gaussian-process, multi-objective, batch, and plotting features.",
       "fit": "Migration target when campaign sponsor brings scikit-optimize code. Lighter than BoFire/BayBe; keeps the scikit-optimize lineage alive.",
       "risks": "Smaller ecosystem signal than BoFire/BayBe. Inherits scikit-optimize's pre-existing limitations (no NChooseK first-class, no cost-aware).",
       "route": [
@@ -1156,29 +1276,36 @@
     },
     {
       "tool_id": "tabpfn_v2",
-      "name": "TabPFN v3 (foundation-model surrogate)",
+      "name": "TabPFN (foundation-model surrogate)",
       "category": "surrogate_modeling",
       "priority": "P2",
       "status": "adopted_optional",
-      "posture": "optional token-gated low-data surrogate adapter; runtime token required and never stored",
+      "posture": "optional low-data surrogate adapter; this repository requires a runtime token for noninteractive use",
       "package": "tabpfn>=8,<9",
       "pyproject_extra": "tabpfn",
-      "license": "Apache-2.0",
+      "license": "Prior Labs License for code and v2 weights; non-commercial license for default TabPFN-3 weights",
       "links": {
         "repo": "https://github.com/PriorLabs/TabPFN",
         "paper": "https://www.nature.com/articles/s41586-024-08328-6",
         "pypi": "https://pypi.org/project/tabpfn/"
       },
-      "last_checked": "2026-05-23",
-      "current_signal": "PyPI tabpfn 8.0.3 verified 2026-05-23. Public adapter is token-gated via TABPFN_TOKEN and remains inactive without an operator-supplied runtime token. It routes only as a planning surrogate for low-data/small-factor-count campaigns and preserves BioSymphony constraint, assay, scale, cost, and readiness gates.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "8.5.0",
+      "upstream_released_on": "2026-08-27",
+      "current_signal": "PyPI 8.5.0 is current upstream and uses TabPFN-3 by default. This repository's noninteractive adapter requires TABPFN_TOKEN at runtime; upstream also supports interactive browser-based license acceptance.",
       "fit": "Low-data tabular regression surrogate for sequential planning when n<20 or the operator explicitly requests a TabPFN-backed planning experiment.",
-      "risks": "Token-gated and non-commercial terms require operator review. No native NChooseK ownership; constraints are handled by the BioSymphony/Botorch wrapper and post-hoc validation. Predictions are model suggestions, not lab validation.",
+      "risks": "Default TabPFN-3 weights are non-commercial, while the code and v2 weights carry the Prior Labs License with an attribution provision. Review terms before use. No native NChooseK ownership; the repository wrapper and post-hoc validation handle constraints. Predictions are model suggestions, not lab validation.",
       "route": [
         "foundation_model_surrogate_pilot",
         "small_data_tabular_regression",
         "optional_in_repo_adapter"
       ],
       "claim_level": "tabpfn_adapter_planning",
+      "route_reasons": [
+        "low_data_regime",
+        "small_factor_count",
+        "operator_requested_tabpfn"
+      ],
       "fail_closed_behavior": "Adapter remains importable without token or package; plan reports degrade to not_available and stdlib fallback remains authoritative.",
       "docs_in_repo": [
         "src/biosymphony_ferm_doe/adapters/tabpfn_strategy.py",
@@ -1203,7 +1330,9 @@
         "paper_v2": "https://arxiv.org/abs/2602.11139",
         "paper_v1": "https://arxiv.org/abs/2502.05564"
       },
-      "last_checked": "2026-06-21",
+      "last_checked": "2026-08-30",
+      "upstream_version": "2.1.1",
+      "upstream_released_on": "2026-04-29",
       "current_signal": "PyPI tabicl 2.1.1 released 2026-04-29; official repo describes TabICLv2 as the ICML 2026 successor to TabICL with open inference code and weights, scikit-learn compatibility, regression/classification support, and larger-table scaling.",
       "fit": "Watch as a possible TabPFN comparison surrogate for larger public result tables, especially when zero-tuning tabular regression is useful but TabPFN's small-data posture is limiting.",
       "risks": "No native DoE constraint ownership, assay semantics, or scale context; checkpoint download and GPU memory behavior need a fixture before any adapter work.",
@@ -1230,10 +1359,10 @@
         "paper": "https://arxiv.org/abs/2402.03921",
         "optunahub": "https://hub.optuna.org/samplers/llambo/"
       },
-      "last_checked": "2026-05-16",
-      "current_signal": "ICLR 2024 paper (arXiv:2402.03921). OptunaHub sampler verified with Optuna 4.1.0, last update 2025-03-28, langchain >=0.3 + openai >=1.41. 108 stars on reference repo. Three independent LLM modules: zero-shot warmstart, in-context-regression surrogate, candidate sampler.",
+      "last_checked": "2026-08-30",
+      "current_signal": "The ICLR 2024 reference repository has no tagged release and its latest public activity remains from 2024. Keep LLAMBO as a literature reference rather than a load-bearing adapter.",
       "fit": "Warmstart-only \u2014 beats random init at trial 1-10 because the LLM has read the literature. After that ~GP-equivalent. Strong scoping due to Gupta 2024 negative result on LLM-in-the-inner-loop.",
-      "risks": "Gupta et al. arXiv:2509.21403 demonstrated LLM-only BO agents show no sensitivity to experimental feedback (label permutation test). Must NEVER replace inner BO loop. OpenAI API tax per acquisition if used outside warmstart scope. OptunaHub sampler delegates categorical to random search.",
+      "risks": "The cited label-permutation study found that the evaluated LLM-only BO agents were insensitive to experimental feedback. Do not use this route for the inner BO loop. External model-service cost and credential requirements apply, and the OptunaHub sampler delegates categorical factors to random search.",
       "route": [
         "llm_warmstart_first_batch",
         "optuna_sampler_pilot"
@@ -1255,8 +1384,10 @@
         "repo": "https://github.com/cog-imperial/OMLT",
         "paper": "https://jmlr.org/papers/v23/22-0277.html"
       },
-      "last_checked": "2026-05-23",
-      "current_signal": "PyPI omlt 1.2.2 verified 2026-05-23. Public optional adapter is import-safe without heavy dependencies and emits not_available/solver_unavailable reports unless OMLT, Pyomo, HiGHS, LightGBM, and ONNX tooling are installed.",
+      "last_checked": "2026-08-30",
+      "upstream_version": "1.2.2",
+      "upstream_released_on": "2025-03-21",
+      "current_signal": "PyPI 1.2.2 remains current upstream. The public optional adapter is import-safe without heavy dependencies and emits not_available or solver_unavailable reports unless its solver and surrogate stack is installed.",
       "fit": "MIP-backed surrogate optimization for linear, categorical, and NChooseK-heavy candidate generation when a fitted surrogate plus hard constraints is the right planning surface.",
       "risks": "Surrogate quality bounds candidate quality; solver stack is heavier than stdlib/BoFire. It must not bypass BioSymphony readiness, assay, evidence, cost, or scale-transfer gates.",
       "route": [
@@ -1265,6 +1396,12 @@
         "optional_in_repo_adapter"
       ],
       "claim_level": "omlt_adapter_planning",
+      "route_reasons": [
+        "non_box_constraints",
+        "operator_requested_omlt",
+        "categorical_factor_present",
+        "trained_surrogate_artifact_present"
+      ],
       "fail_closed_behavior": "Adapter remains importable without optional dependencies; plan reports degrade to not_available or solver_unavailable without raising.",
       "docs_in_repo": [
         "src/biosymphony_ferm_doe/adapters/omlt_strategy.py",

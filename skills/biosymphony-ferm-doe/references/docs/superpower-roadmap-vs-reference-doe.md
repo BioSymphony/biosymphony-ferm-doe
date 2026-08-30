@@ -1,10 +1,10 @@
-# Superpower Roadmap vs Reference DOE
+# Planning Roadmap vs Reference DOE
 
 ## Point Of View
 
 Commercial DOE software is already strong at classical and modern DOE once the experiment has been statistically framed. BioSymphony Ferm DoE should not pretend that a generic checklist beats that baseline.
 
-The superpower is earlier and broader:
+The planning workflow starts earlier and covers more context:
 
 ```text
 messy bioprocess ask
@@ -12,12 +12,12 @@ messy bioprocess ask
   -> scientific readiness gates
   -> multi-agent strategy tournament
   -> DOE backend selection and scoring
-  -> runnable ferm-doe-dossier
+  -> review-ready planning dossier
   -> tracker issue DAG
   -> result ingestion and follow-up planner
 ```
 
-If we only create documents, checklists, and static packs, we are creating noise for a future planner. If we create executable campaign state, validators, design scoring, and memory, we are giving the planner leverage it does not get from a generic agent harness.
+The repo should pair documents with structured campaign state, validators, design scoring, and memory. Those artifacts give an agent enough context to plan and review work consistently.
 
 ## Current State
 
@@ -34,11 +34,11 @@ flowchart LR
   C --> I["RED/YELLOW/GREEN gatekeeping"]
   D --> J["Rank, estimability, D/I/A/G, FDS labels"]
   E --> K["Screening, RSM, mixture, space filling, custom optimal"]
-  F --> L["Lab packet plus parity reports"]
+  F --> L["Planning packet plus parity reports"]
   G --> M["Confirm/narrow/expand/pause/stop/scale"]
 ```
 
-Current status: local engine baseline. It has executable campaign compilation, deterministic DOE candidates, model-matrix diagnostics, design comparison, readiness vetoes, dossier generation, dry-run issue packs, and follow-up ingestion. It is not claiming complete commercial DOE statistical parity where local implementations are labeled approximate or heuristic.
+Current status: local engine baseline. It has structured campaign compilation, deterministic DOE candidates, model-matrix diagnostics, design comparison, readiness checks, dossier generation, dry-run issue packs, and follow-up ingestion. It does not claim complete commercial DOE statistical parity where local implementations are labeled approximate or heuristic.
 
 ## Reference DOE Baseline
 
@@ -50,11 +50,11 @@ Commercial DOE documentation sets a real benchmark:
 - Design evaluation with power analysis, prediction variance profiles, fraction-of-design-space plots, alias matrices, correlations, and efficiency diagnostics.
 - Optimality criteria including D-, I-, A-, Bayesian, and alias-optimal variants.
 
-Implication: BioSymphony Ferm DoE should not compete by manually rephrasing DOE. It should compete by doing the work commercial DOE tools do not own: problem formation, evidence gathering, assay/process readiness, phase-aware bioprocess planning, agent tournaments, execution packets, and adaptive campaign memory.
+Implication: BioSymphony Ferm DoE should not compete by manually rephrasing DOE. It is designed to cover the surrounding work: problem formation, evidence gathering, assay/process readiness, phase-aware bioprocess planning, agent tournaments, planning packets, and adaptive campaign memory.
 
 ## Where BioSymphony Must Be Better
 
-| Layer | Reference DOE Strength | BioSymphony Ferm DoE Superpower |
+| Layer | Reference DOE Strength | BioSymphony Ferm DoE Planning Strength |
 | --- | --- | --- |
 | Factor table | Strong once factors are known | Infer and challenge candidate factors from biology, vessel, product class, phases, observability, prior data, and literature |
 | Experimental design | Strong optimal/custom designs | Choose among DOE strategies using campaign context, feasibility, assay risk, and future follow-up value |
@@ -62,7 +62,7 @@ Implication: BioSymphony Ferm DoE should not compete by manually rephrasing DOE.
 | Response definition | User supplied | Force response semantics: titer, productivity, yield, product per biomass, quality, whole-broth vs pellet-associated product |
 | Scale transfer | Not the main product | Treat flask-to-bioreactor, scale-up, and downscale as first-class workflow modes |
 | Literature priors | Outside reference DOE | Dispatch agents to PubMed, bioRxiv, Google Scholar, protocols, and prior runs, then convert evidence into factor priors |
-| Execution packet | Table-centric | Produce run sheet, sampling schedule, reagent plan, capture schema, control strategy, and follow-up rules |
+| Planning packet | Table-centric | Produce a run-sheet draft, sampling schedule, reagent plan, capture schema, control strategy, and follow-up rules |
 | Campaign memory | Manual | Store negative-result memory and feed it into the next compiler pass |
 
 ## Target Architecture
@@ -101,16 +101,16 @@ flowchart TD
   J --> D["Selected design and control-run plan"]
   D --> O["ferm-doe-dossier"]
   O --> X["Tracker issue DAG"]
-  O --> Y["Optional remote validation bundle"]
+  O --> Y["Optional remote evaluation bundle"]
   O --> Z["follow-up decision rules"]
   Z --> C
 ```
 
 ## Workflow Modes
 
-Packs should be autonomous workflow modes. They should accelerate the planner without limiting reasoning.
+Packs should represent bounded workflow modes. They should accelerate the planner without limiting reasoning.
 
-| Mode | What It Handles | Non-Negotiable Guardrails | Superpower Test |
+| Mode | What It Handles | Non-Negotiable Guardrails | Decision Test |
 | --- | --- | --- | --- |
 | `autonomous-multi-agent-doe-planner` | Any culture or fermentation optimization ask | Must produce competing design strategies, not one default DOE | Does the planner produce a tournament and adjudication rubric? |
 | `shake-flask-to-benchtop-bioreactor` | Flask recipe to controlled pH/DO/feed run | Must address pH drift removal, oxygen transfer, inoculum basis, foam, feedability, and response comparability | Does it catch what breaks when moving from uncontrolled flask to controlled reactor? |
@@ -131,7 +131,7 @@ A pack is allowed only if it provides at least one of these:
 - an issue graph that saves orchestration time
 - a benchmark example with expected outputs
 
-If a pack is only advice that a strong planner can invent in one paragraph, delete it.
+If a pack is only advice that a strong planner can invent in one paragraph, do not add it.
 
 ## What To Harden Next
 
@@ -160,17 +160,17 @@ If a pack is only advice that a strong planner can invent in one paragraph, dele
 5. UI or notebook surface
    - Defer until the file/CLI contract remains stable across real campaigns.
 
-## Product Bar
+## Success Criteria
 
-BioSymphony Ferm DoE is only superpowered if it changes the decision quality before a lab run.
+The workflow is valuable when it improves the decision made before a lab run.
 
 For every workflow, ask:
 
 1. Did it prevent a bad experiment?
 2. Did it discover a better objective or response definition?
 3. Did it make scale transfer explicit?
-4. Did it create a design that is more runnable than a generic DOE table?
-5. Did it produce artifacts the lab can execute without translation?
+4. Did it create a design that is more feasible under the stated constraints than a generic DOE table?
+5. Did it produce artifacts the lab can review and adapt without losing context?
 6. Did it produce rules for what to do after results arrive?
 
-If the answer is no, it is documentation noise rather than a working superpower.
+If the answer is no, the pack adds documentation without adding an operational capability.

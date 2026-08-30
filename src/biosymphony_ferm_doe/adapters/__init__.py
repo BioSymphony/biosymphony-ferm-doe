@@ -11,9 +11,8 @@ libraries:
 - ``nist_citations``: NIST/SEMATECH e-Handbook references for each DoE
   family. Adds citations to ``recommend_family`` decision paths. No
   external dependency — pure data.
-- ``pydoe3_designs``: D-optimal and I-optimal designs via pyDOE3.
-  Upgrades ``claim_level`` from ``heuristic`` to ``exact`` for those two
-  families.
+- ``pydoe3_designs``: extended Box-Behnken coverage and maximin Latin
+  hypercube designs via pyDOE3.
 - ``botorch_wave2``: Bayesian optimization for follow-up candidate selection
   via BoTorch + GPyTorch. Replaces geometric narrowing with GP-surrogate
   + acquisition-function-driven next-points. Upgrades follow-up claim level
@@ -26,16 +25,16 @@ libraries:
   post-hoc analysis of sequential responses. PAWN and delta are model-free
   and run on any (X, Y) pair; Sobol requires a Saltelli sample.
 - ``entmoot``: tree-ensemble Bayesian optimization with MIP-encoded
-  NChooseK / linear constraints via ENTMOOT v2 + Pyomo + HiGHS. The
-  swap candidate for any campaign where BoFire's ``SoboStrategy``
-  stalls on NChooseK (upstream issue #450). Module-importable without
-  ENTMOOT installed so the engine can still record routing decisions.
+  NChooseK / linear constraints via ENTMOOT v2 + Pyomo + HiGHS. It is
+  the conservative route for campaigns affected by the NChooseK behavior
+  found in this repository's BoFire 0.3.1 audit. The module is importable
+  without ENTMOOT so the engine can still record routing decisions.
 - ``omlt``: MIP-optimized surrogate planning through OMLT + Pyomo. The
   module is importable without OMLT installed and degrades to an explicit
   ``not_available`` or ``solver_unavailable`` report.
-- ``tabpfn``: token-gated foundation-model surrogate route for low-data
-  sequential planning. The adapter is inert unless the package is installed and
-  the operator supplies a runtime ``TABPFN_TOKEN``.
+- ``tabpfn``: foundation-model surrogate route for low-data sequential
+  planning. This repository's noninteractive adapter is inert unless the
+  package is installed and the operator supplies a runtime ``TABPFN_TOKEN``.
 
 Each adapter checks importability at first call. CLI subcommands accept
 ``--backend`` flags that route to adapters when available and fall back

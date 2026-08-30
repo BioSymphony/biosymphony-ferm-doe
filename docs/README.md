@@ -13,7 +13,7 @@ This repo is a skill you point a coding agent at. Start with the agent prompt an
 - [`GLOSSARY.md`](GLOSSARY.md): short definitions of campaign, profile, claim level, scale context, arm, first-batch/follow-up checkpoints, run packet, dossier, adapter, kLa, NChooseK, and the rest.
 - [`CLI_REFERENCE.md`](CLI_REFERENCE.md): single-page index of every `ferm-doe` subcommand.
 - [`ADAPTER_MAP.md`](ADAPTER_MAP.md): capability-centric map of optional extras.
-- [`superpowers.md`](superpowers.md): executable capability index.
+- [`superpowers.md`](superpowers.md): capability index.
 - [`PUBLIC_ADOPTION_PATH.md`](PUBLIC_ADOPTION_PATH.md): from first clone, to repo-local skill, to agent harness.
 - [`../examples/README.md`](../examples/README.md): demo chooser and expected validation statuses.
 
@@ -51,7 +51,7 @@ This repo is a skill you point a coding agent at. Start with the agent prompt an
 - [`ORCHESTRATOR_BOUNDARY.md`](ORCHESTRATOR_BOUNDARY.md): boundary between this skill pack and capable orchestrators.
 - [`SWARMS_AND_EVIDENCE.md`](SWARMS_AND_EVIDENCE.md): research-support and source-tracking pattern for design rationale.
 - [`sidecar-architecture.md`](sidecar-architecture.md): swappable sidecar packs and provider handoff boundaries.
-- [`ISSUE_PACK_COOKBOOK.md`](ISSUE_PACK_COOKBOOK.md): runnable issue-pack commands and pack chooser.
+- [`ISSUE_PACK_COOKBOOK.md`](ISSUE_PACK_COOKBOOK.md): issue-pack commands and pack chooser.
 - [`ISSUE_PACK_GENERATION.md`](ISSUE_PACK_GENERATION.md): end-to-end runbook for `engine generate-issue-pack`, output anatomy, and orchestrator integration patterns.
 - [`diagrams/agent-loop-public.mmd`](diagrams/agent-loop-public.mmd): source for the README public agent-loop diagram.
 - [`../agents/`](../agents): runtime-specific agent configs.
@@ -62,7 +62,7 @@ This repo is a skill you point a coding agent at. Start with the agent prompt an
 - [`TOOL_REGISTRY.md`](TOOL_REGISTRY.md): curated BO/DoE tool registry.
 - [`tool-registry.json`](tool-registry.json): machine-readable registry.
 - [`BIOMANUFACTURING_ADAPTIVE_BACKENDS.md`](BIOMANUFACTURING_ADAPTIVE_BACKENDS.md): BoFire, BayBE, Ax/BoTorch, ENTMOOT, OMLT, and TabPFN routing surface plus the depth ladder.
-- [`BACKEND_EVAL_FINDINGS.md`](BACKEND_EVAL_FINDINGS.md): quantitative 6-fixture sweep results across seven backends; OMLT-supersedes-ENTMOOT finding; BoFire main currency note.
+- [`BACKEND_EVAL_FINDINGS.md`](BACKEND_EVAL_FINDINGS.md): dated six-fixture findings across seven backends, including the May 2026 OMLT and BoFire evaluation notes.
 - [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md): non-obvious adapter design decisions (OMLT lower-coupling, TabPFN Gaussian-approximation posterior wrap, BoTorch cost-weighting trap, MO BO memory knobs).
 - [`adaptive-backend-evaluation.json`](adaptive-backend-evaluation.json): backend comparison fixture.
 - [`BOFIRE_POSITIONING.md`](BOFIRE_POSITIONING.md): BoFire route boundaries.
@@ -72,7 +72,7 @@ This repo is a skill you point a coding agent at. Start with the agent prompt an
 - [`open-source-bioprocess-tool-survey-2026-05-15.md`](open-source-bioprocess-tool-survey-2026-05-15.md): bioprocess-specific landscape scan.
 - [`research/bo-tools-survey-2026-05-16.md`](research/bo-tools-survey-2026-05-16.md): broader BO-tools landscape (LLAMBO, TabPFN v2, BayBE, BoFire main) that informed the ENTMOOT swap and TabPFN adapter routes.
 
-## Internals And Roadmap
+## Technical Reference And Roadmap
 
 - [`engine-implementation.md`](engine-implementation.md): what the local engine implements today.
 - [`SIMULATOR_V2_SPEC.md`](SIMULATOR_V2_SPEC.md): simulator v2 spec (SPEC ONLY; not yet implemented).

@@ -32,6 +32,9 @@ BACKEND_TO_REGISTRY_ID = {
     "entmoot": "entmoot",
     "omlt": "omlt",
     "tabpfn": "tabpfn_v2",
+    "plotly": "plotly",
+    "salib": "salib",
+    "frictionless": "frictionless",
 }
 EVALUATION_BACKEND_MODULES = {
     "ax": ["ax"],
@@ -39,6 +42,11 @@ EVALUATION_BACKEND_MODULES = {
     "entmoot": ["entmoot"],
     "omlt": ["omlt", "pyomo", "highspy", "lightgbm", "onnxmltools"],
     "tabpfn": ["tabpfn", "torch", "botorch", "gpytorch"],
+}
+OPTIONAL_CAPABILITY_MODULES = {
+    "plotly": ["plotly"],
+    "salib": ["SALib"],
+    "frictionless": ["frictionless"],
 }
 TOKEN_ENV_VARS = {
     "tabpfn": "TABPFN_TOKEN",
@@ -129,12 +137,27 @@ def dependency_status() -> dict[str, Any]:
             entry["runtime_token_required"] = True
             entry["runtime_token_present"] = bool(os.environ.get(token_env))
         evaluation_backends[backend] = entry
+    optional_capabilities = {}
+    for capability, modules in OPTIONAL_CAPABILITY_MODULES.items():
+        found = [module for module in modules if importlib.util.find_spec(module) is not None]
+        available = len(found) == len(modules)
+        entry = {
+            "requested": capability,
+            "available": available,
+            "modules": modules,
+            "found_modules": found,
+            "status": "available" if available else "not_available",
+            "note": "Optional support capability is available." if available else "Optional support capability is not installed.",
+        }
+        entry.update(_registry_attachment(capability, registry_index))
+        optional_capabilities[capability] = entry
     return {
         "schema_version": 1,
         "dependency_status_kind": "ferm_doe_utility_dependencies",
         "supported_backends": SUPPORTED_BACKENDS,
         "backends": backends,
         "evaluation_backends": evaluation_backends,
+        "optional_capabilities": optional_capabilities,
     }
 
 

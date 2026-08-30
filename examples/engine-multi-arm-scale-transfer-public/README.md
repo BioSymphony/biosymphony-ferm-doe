@@ -32,7 +32,7 @@ ferm-doe finalize examples/engine-multi-arm-scale-transfer-public \
 
 - **`validate --summary`**: status `YELLOW`, `error_count == 0`. Both arms validate as planning artifacts.
 - **`scale-recipe`**: writes a per-arm recipe with kLa, P/V, tip-speed, and mixing-time targets, plus a bridge-confidence rollup.
-- **`finalize`**: stitches both arms into one shippable run packet with goals, decision rules, stop rules, sampling plans, and a multi-arm summary table.
+- **`finalize`**: stitches both arms into one review-ready planning packet with goals, decision rules, stop rules, sampling plans, and a multi-arm summary table.
 
 ## Non-claims
 

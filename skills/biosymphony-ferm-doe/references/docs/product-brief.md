@@ -44,10 +44,10 @@ ferm-doe-dossier/
 
 ## Readiness Verdict
 
-Every campaign should produce a hard status before physical setup:
+Every campaign should produce an explicit status before physical setup:
 
-- `GREEN`: ready to run first-batch
-- `YELLOW`: runnable with explicit caveats
+- `GREEN`: meets the declared readiness checks; separate execution review still applies
+- `YELLOW`: planning may continue with explicit caveats
 - `RED`: do not run yet; fix assay, data, constraints, objective, or safety blockers
 
 ## High-ROI Modules
@@ -74,5 +74,5 @@ Given a fermentation goal, optional historical CSVs, approximate reagent invento
 - assay readiness checklist
 - feasibility report
 - selected first-batch design stub
-- lab-ready packet outline
-- Linear issues for Symphony execution
+- planning packet outline for lab review
+- optional tracker issues for follow-up work

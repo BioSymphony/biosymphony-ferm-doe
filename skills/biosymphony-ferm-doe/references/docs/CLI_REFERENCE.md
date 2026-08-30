@@ -77,7 +77,7 @@ See [`ADAPTIVE_WAVE2.md`](ADAPTIVE_WAVE2.md) for the conceptual model and [`WAVE
 
 | Command | Purpose | Example |
 |---|---|---|
-| `ferm-doe finalize` | Compose every available artifact into one shippable run-packet (Markdown + JSON). | `ferm-doe finalize examples/demo-pb-screening-public --results examples/demo-pb-screening-public/inputs/wave1_results.csv --out /tmp/run_packet.md --json-out /tmp/run_packet.json` |
+| `ferm-doe finalize` | Compose every available artifact into one review-ready planning run packet (Markdown + JSON). | `ferm-doe finalize examples/demo-pb-screening-public --results examples/demo-pb-screening-public/inputs/wave1_results.csv --out /tmp/run_packet.md --json-out /tmp/run_packet.json` |
 
 ## Engine: full dossier flow
 

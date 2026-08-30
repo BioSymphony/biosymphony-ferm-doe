@@ -18,12 +18,12 @@ The loop is:
 3. **Close the loop.** Analyze the first-batch results, plan the follow-up batch, preserve negative-result memory, and produce a run packet plus `expected/AGENTS.md` handoff.
 4. **Coordinate the work.** Run locally, hand to a repo-local coding agent, split into issue packs, mirror status into Linear, or expose selected checks through AWS Lambda or Modal.
 
-Terminology note: the repo keeps internal identifiers such as `wave1`, `wave2`, `plan-wave2`, and `planned_wave2_design` because they are stable artifact and CLI contracts. They are checkpoint labels, not a predetermined experiment schedule. In public-facing copy, think "first batch," "follow-up batch," or "adaptive next step": results are QC-reviewed before the next action is chosen.
+Checkpoint labels: artifact and CLI contracts use names such as `wave1`, `wave2`, `plan-wave2`, and `planned_wave2_design`. They describe first-batch and follow-up checkpoints, not a predetermined experiment schedule. Results are QC-reviewed before the next action is chosen.
 
 Key capabilities implemented in code:
 
-- A curated 47-tool BO/DoE and sidecar registry (`docs/TOOL_REGISTRY.md`, `docs/tool-registry.json`) with documented tradeoffs and direct adapters for the load-bearing entries (BoFire, ENTMOOT v2, OMLT, TabPFN, BoTorch, pyDOE3, SALib, scipy, PubMed MCP).
-- A public adaptive-backend surface (`docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md`, `docs/adaptive-backend-evaluation.json`) that lets BoFire, BayBE, Ax/BoTorch, ENTMOOT, OMLT, and TabPFN compete behind the same design preflight checks.
+- A curated BO/DoE and sidecar registry (`docs/TOOL_REGISTRY.md`, `docs/tool-registry.json`) with documented tradeoffs and direct adapters for the load-bearing entries (BoFire, ENTMOOT v2, OMLT, TabPFN, BoTorch, pyDOE3, SALib, scipy, PubMed MCP).
+- A public adaptive-backend surface (`docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md`, `docs/adaptive-backend-evaluation.json`) that compares BoFire, BayBE, Ax/BoTorch, ENTMOOT, OMLT, and TabPFN through the same design preflight checks.
 - A cost-model honesty stack: simulator number, plus bulk-reagent number, plus fully-loaded shake-flask COGS, plus CMO benchmark, plus a stated range. Documented in `docs/COST_MODEL_REALISM_CHECK.md` with `templates/cost_stack.template.md`.
 - Scale-bridge objects with explicit kLa, P/V, tip-speed, mixing-time, OUR, RQ, VVM, and geometric-similarity criteria.
 - A durable campaign manifest that supports pause, resume, Linear-backed review, and handoff between agent sessions or between an agent and a human.
@@ -74,10 +74,10 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  SRC("source scale<br/>qualified · real data"):::hero --> BR{"bridge criteria<br/>kLa · P/V · tip-speed<br/>mix-time · OUR · RQ · VVM<br/>geometric similarity"}:::gate
-  BR -->|"all matched"| MATCH("Match → proceed"):::go --> TGT("target scale<br/>predicted behavior"):::proc
+  SRC("source scale<br/>qualified data or stated basis"):::hero --> BR{"bridge criteria<br/>kLa · P/V · tip-speed<br/>mix-time · OUR · RQ · VVM<br/>geometric similarity"}:::gate
+  BR -->|"all criteria met"| MATCH("Match → review"):::go --> TGT("target scale<br/>planning hypothesis"):::proc
   BR -->|"some gaps"| GAP("Gap → measure / estimate"):::gate
-  BR -->|"not qualified"| RED("Redesign → agent escalates"):::block
+  BR -->|"not qualified"| RED("Revise → review the bridge"):::block
   classDef hero fill:#1b1b18,stroke:#d9d2c0,color:#ffffff,stroke-width:1.5px;
   classDef proc fill:#fffdf8,stroke:#2b2926,color:#2b2926,stroke-width:1.5px;
   classDef gate fill:#fffdf8,stroke:#b0892f,color:#8a6a1f,stroke-width:1.5px;
@@ -123,14 +123,14 @@ A first run:
 
 When you have a real campaign, pick a job-to-be-done from [`docs/USE_CASES.md`](docs/USE_CASES.md) and an agent harness from [Agent harnesses](#agent-harnesses).
 
-The readiness gate decides what the agent does next: RED blocks, YELLOW proceeds with listed limits, GREEN is worth running:
+The readiness gate decides what the agent does next: RED blocks, YELLOW continues planning with listed limits, and GREEN means the declared checks are clear:
 
 ```mermaid
 flowchart TB
   M[("campaign_manifest.json")]:::hero --> V("validate --summary"):::proc --> W{"worst axis +<br/>failed checks"}:::gate
   W -->|"errors present"| R("RED · do not proceed"):::block
   W -->|"guidance / synthetic"| Y("YELLOW · proceed with limits<br/>planning only"):::gate
-  W -->|"all axes clear"| G("GREEN · worth running"):::go
+  W -->|"all axes clear"| G("GREEN · checks clear"):::go
   R --> FIX("fix failed checks → re-run"):::block --> V
   Y --> N("design · analyze · plan follow-up"):::proc
   G --> N
@@ -312,7 +312,7 @@ When the manifest is incomplete, the validator surfaces specific guidance instea
 
 A long-running agent reads `failed_check_ids`, fixes them in priority order, re-runs `validate`, and iterates.
 
-Each readiness axis is a gate the campaign must clear before it earns lab time. Any gate can stop it:
+Each readiness axis is a review checkpoint. The summary helps the agent decide what needs attention before the campaign is considered for lab time. A blocking error can stop progress:
 
 ```mermaid
 flowchart TB
@@ -323,17 +323,17 @@ flowchart TB
   G2 -->|"yes"| G3{"doe-power:<br/>enough runs<br/>per coefficient?"}:::gate
   G3 -->|"no"| X3("underpowered"):::block
   G3 -->|"yes"| G4{"feasibility:<br/>fits equipment<br/>+ staffing?"}:::gate
-  G4 -->|"no"| X4("not runnable"):::block
+  G4 -->|"no"| X4("not feasible"):::block
   G4 -->|"yes"| G5{"scale bridge<br/>qualified?"}:::gate
   G5 -->|"no"| X5("escalate: bridge gap"):::block
-  G5 -->|"yes"| OK("readiness verdict:<br/>worth running"):::go
+  G5 -->|"yes"| OK("readiness verdict:<br/>checks clear"):::go
   classDef hero fill:#1b1b18,stroke:#d9d2c0,color:#ffffff,stroke-width:1.5px;
   classDef gate fill:#fffdf8,stroke:#b0892f,color:#8a6a1f,stroke-width:1.5px;
   classDef go fill:#fffdf8,stroke:#6f7d3f,color:#566230,stroke-width:1.5px;
   classDef block fill:#fffdf8,stroke:#bf5a3c,color:#a44a2f,stroke-width:1.5px;
 ```
 
-Every generated artifact also carries a `claim_level` that signals how rigorously the rows were produced, so a statistician (or a downstream agent) can decide whether to trust them as-is, review them, or rebuild them.
+Every generated artifact also carries a `claim_level` that signals how rigorously the rows were produced, so a statistician (or a downstream agent) can review them, use them with stated limits, or rebuild them.
 
 ```mermaid
 flowchart TB
@@ -363,25 +363,27 @@ flowchart TB
 
 These eight labels live on three axes. **A** is a rigor ladder for how the design matrix was generated, from `exact` down to `heuristic`: an agent that sees `claim_level: heuristic` surfaces the row to a statistician before sealing the campaign. **B** marks planning and analysis outputs that were computed but not executed (the follow-up plan, the BO plan, the first-batch analysis). **C** is a provenance flag: `public_synthetic_demo` blocks any ready-to-run claim.
 
-## How it differs from the alternatives
+## Where this project fits
 
-| | **biosymphony-ferm-doe** | JMP / Design-Expert / Modde | Raw Python (pyDOE3, dexpy) | Working alone in a notebook |
-|---|---|---|---|---|
-| Input completeness and run-readiness checks | yes | no | no | no |
-| Scale-up / scale-down as first-class objects | yes | no | no | sometimes |
-| Profile-driven manifest | yes | no | no | no |
-| Source-tracked design rationale | yes | no | no | sometimes |
-| Long-running-agent loop | yes | no | no | no |
-| Cost-model honesty stack | yes | no | no | sometimes |
-| Generates DoE designs | yes; full factorial, fractional factorial, Plackett-Burman, definitive screening, central composite, Box-Behnken, simplex-lattice and simplex-centroid mixture, Latin hypercube, D/I-optimal and extreme-vertices (labeled `heuristic`) | yes | yes | sometimes |
-| Bayesian optimization for follow-up batches | yes; BoTorch, BoFire, ENTMOOT, OMLT, and TabPFN adapters with documented routing | partial | no | sometimes |
-| Constrained mixture or NChooseK | yes; BoFire DoEStrategy plus ENTMOOT/OMLT MIP-backed adapters | yes | no | no |
-| Statistical analysis of results | yes; stdlib OLS with permutation p-values, bootstrap CIs, lack-of-fit, half-normal plot data, labeled `wave1_analysis_planned` for statistician review | yes | partial | sometimes |
-| GxP-validated | no | varies | no | no |
+This project adds a manifest-driven planning and review layer around DoE generators. The table describes this repository's scope; capabilities and workflows in other tools vary by product and configuration. It is a positioning summary, not a feature or quality ranking.
 
-This is a planning layer that sits above a DoE generator and a statistician. It frames what the campaign needs to learn, what would make it fail, and which measurements, constraints, and scale criteria have to be in place before a design is worth running.
+| Planning concern | BioSymphony Ferm DoE | Typical companion or alternative |
+|---|---|---|
+| Input completeness and run-readiness checks | Manifest plus validator checks | Product and workflow dependent |
+| Scale-up and scale-down framing | First-class scale and bridge objects | Product and workflow dependent |
+| Profile-driven campaign state | JSON manifest with named profiles | Product and workflow dependent |
+| Source-tracked design rationale | Evidence and provenance fields | Product and workflow dependent |
+| Long-running planning loop | Durable manifest, handoff, and follow-up artifacts | Agent or workflow dependent |
+| Cost-model disclosure | Five-layer cost stack with caveats | Product and workflow dependent |
+| DoE generation | Stdlib generators plus optional adapters; each output carries a claim level | Commercial or open-source DoE generator |
+| Bayesian follow-up planning | Optional BoTorch, BoFire, ENTMOOT, OMLT, and TabPFN routes with documented limits | Backend and workflow dependent |
+| Constrained mixture or NChooseK | Selected adapters for declared constraint shapes | Backend and workflow dependent |
+| Result analysis | Stdlib OLS planning analysis with permutation p-values, bootstrap CIs, and lack-of-fit; labeled for review | Statistical tooling and review |
+| GxP execution | Not provided | Separate validated execution system |
 
-**The design tournament.** It does not emit one design. It generates competing design strategies, scores each against readiness, feasibility, and assay-readiness, and returns the best *runnable* one (or refuses with `no_accepted_design`):
+This is a planning layer that sits above a DoE generator and a statistician. It frames what the campaign needs to learn, what would make it fail, and which measurements, constraints, and scale criteria should be reviewed before a design is considered for physical work.
+
+**The design tournament.** It does not emit one design. It generates competing design strategies, scores each against readiness, feasibility, and assay-readiness, and returns the strongest accepted planning candidate (or refuses with `no_accepted_design`):
 
 ```mermaid
 flowchart LR
@@ -406,7 +408,7 @@ flowchart LR
   classDef audit fill:#fffdf8,stroke:#7d6a9c,color:#5f5080,stroke-width:1.5px;
 ```
 
-The skeptical audit lane informs scoring but is never selected as the executable design (`tournament.py · run_design_tournament()`).
+The skeptical audit lane informs scoring but is never selected as the design candidate (`tournament.py · run_design_tournament()`).
 
 **The cost-honesty stack.** Cost is reported in five layers, optimistic to fully-loaded, so a number is never quoted without its caveats:
 
@@ -432,7 +434,7 @@ Public demos cover the main campaign shapes. The non-BoFire demos run on the std
 | Profile | Demo | What it shows |
 |---|---|---|
 | `screening` | [`demo-xylanase-public/`](examples/demo-xylanase-public/) | Public xylanase enzyme-production planning; assay-readiness gating; minimum manifest shape |
-| `scale_down_qualification` | [`demo-scale-bridge-public/`](examples/demo-scale-bridge-public/) | Pilot 50 L to bench 2 L kLa-matched downscale; multi-arm; full `scale_context` |
+| `scale_down_qualification` | [`demo-scale-bridge-public/`](examples/demo-scale-bridge-public/) | Planning fixture for a pilot 50 L to bench 2 L downscale with a declared kLa bridge; multi-arm; full `scale_context` |
 | `split_plot_fed_batch` | [`demo-split-plot-fedbatch-public/`](examples/demo-split-plot-fedbatch-public/) | Hard-to-change vs easy-to-change factors; whole-plot ID in design rows |
 | `screening` | [`demo-pb-screening-public/`](examples/demo-pb-screening-public/) | 7-factor Plackett-Burman plus 4 center-point replicates; closed-loop walkthrough exercising first-batch design, analysis, `plan-wave2`, and finalize end-to-end with synthetic results bundled |
 | `screening` (diagnostic) | [`demo-warnings-walkthrough-public/`](examples/demo-warnings-walkthrough-public/) | Intentionally underspecified manifest that surfaces 8 validator warnings; a worked example of the guidance path |
@@ -442,11 +444,11 @@ Public demos cover the main campaign shapes. The non-BoFire demos run on the std
 | Reference DOE | [`reference-doe-custom-design/`](examples/reference-doe-custom-design/) | Custom constrained design fixture for reference-DOE parity checks |
 | Public paper starter | [`xylanase-wxz1-2012/`](examples/xylanase-wxz1-2012/) | Public-literature-derived starter dataset normalized into the manifest contract |
 | Product-class starter | [`yeast-isoprenoid-2l-fedbatch/`](examples/yeast-isoprenoid-2l-fedbatch/) | Hydrophobic product planning fixture with derived productivity and cost responses |
-| ENTMOOT smoke | [`entmoot-nchoosek-smoke/`](examples/entmoot-nchoosek-smoke/) | NChooseK Bayesian optimization via ENTMOOT v2 when BoFire's `SoboStrategy` + `NChooseK` stalls (upstream issue #450) |
+| ENTMOOT smoke | [`entmoot-nchoosek-smoke/`](examples/entmoot-nchoosek-smoke/) | NChooseK Bayesian optimization via ENTMOOT v2, the conservative route for the behavior recorded in the repository's BoFire 0.3.1 audit |
 
 ## Architecture
 
-The hero loop at the top of this README is the first-run loop. The internal flow is:
+The hero loop at the top of this README is the first-run loop. The implementation flow is:
 
 ```mermaid
 flowchart TB
@@ -478,8 +480,8 @@ flowchart TB
 - [`docs/AGENT_QUICKSTART.md`](docs/AGENT_QUICKSTART.md): copy-paste prompt and first commands for coding agents
 - [`docs/USE_CASES.md`](docs/USE_CASES.md): newcomer workflow chooser and example agent requests
 - [`docs/WORKFLOWS.md`](docs/WORKFLOWS.md): local, agent, Linear, issue-pack, and cloud-resource workflow map
-- [`docs/ORCHESTRATOR_BOUNDARY.md`](docs/ORCHESTRATOR_BOUNDARY.md): what BioSymphony owns versus what Codex, Claude Code, `/goal`, Symphony, Linear, or cloud runners own
-- [`docs/superpowers.md`](docs/superpowers.md): executable capability index and high-value planning moves
+- [`docs/ORCHESTRATOR_BOUNDARY.md`](docs/ORCHESTRATOR_BOUNDARY.md): what BioSymphony owns versus what an agent, tracker, or cloud runner owns
+- [`docs/superpowers.md`](docs/superpowers.md): capability index and high-value planning moves
 - [`docs/PUBLIC_ADOPTION_PATH.md`](docs/PUBLIC_ADOPTION_PATH.md): path from first clone to agent harness to handoff
 - [`docs/PUBLIC_SECURITY_MODEL.md`](docs/PUBLIC_SECURITY_MODEL.md): local-first privacy, secret, scanner, and deployment boundaries
 - [`docs/RELEASE_READINESS_CHECKLIST.md`](docs/RELEASE_READINESS_CHECKLIST.md): local public-switch checklist
@@ -495,7 +497,7 @@ flowchart TB
 - [`docs/ADAPTIVE_WAVE2.md`](docs/ADAPTIVE_WAVE2.md): first-batch result ingestion, assay-power checks, and follow-up planning artifacts
 - [`docs/WAVE2_BOTORCH.md`](docs/WAVE2_BOTORCH.md): follow-up planning walkthrough with the BoTorch backend (qEI / qUCB)
 - [`docs/SELF_LEARNING_DOE.md`](docs/SELF_LEARNING_DOE.md): learning ledger, hiccup review, and arm-scoped negative memory runbook
-- [`docs/TOOL_REGISTRY.md`](docs/TOOL_REGISTRY.md): 47-tool BO/DoE and sidecar landscape with positioning and adapter status
+- [`docs/TOOL_REGISTRY.md`](docs/TOOL_REGISTRY.md): curated BO/DoE and sidecar landscape with positioning and adapter status
 - [`docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md`](docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md): backend-selection surface for BoFire, BayBE, Ax/BoTorch, ENTMOOT, OMLT, and TabPFN
 - [`docs/BOFIRE_POSITIONING.md`](docs/BOFIRE_POSITIONING.md): when to route to BoFire and when to stay on stdlib
 - [`docs/BOFIRE_CONSTRAINT_PATTERNS.md`](docs/BOFIRE_CONSTRAINT_PATTERNS.md): linear, NChooseK, cardinality patterns, including the `SoboStrategy` + `NChooseK` trap
@@ -527,7 +529,7 @@ The skill is runtime-agnostic. State lives in `<campaign_dir>/campaign_manifest.
 - **OpenAI Agents SDK / Codex CLI plus Linear**: see [`agents/openai.yaml`](agents/openai.yaml) and [`agents/linear.md`](agents/linear.md). Same pattern, different runtime.
 - **Generic long-horizon orchestrators**: see [`agents/generic.md`](agents/generic.md). The skill works wherever the agent can read and write the manifest file and shell out to `python3 -m biosymphony_ferm_doe.cli`.
 
-For multi-agent campaigns, the issue-pack contract lets an orchestrator fan work to parallel sub-agents and converge the results into one review packet, with the manifest as the durable spine:
+For multi-agent campaigns, the issue-pack contract lets an orchestrator distribute bounded work to parallel sub-agents and converge the results into one review packet, with the manifest as durable state:
 
 ```mermaid
 flowchart TB
@@ -551,9 +553,9 @@ flowchart TB
 
 The full runbook is in [`docs/ISSUE_PACK_GENERATION.md`](docs/ISSUE_PACK_GENERATION.md); pack chooser and copy-paste recipes live in [`docs/ISSUE_PACK_COOKBOOK.md`](docs/ISSUE_PACK_COOKBOOK.md).
 
-## CLI affordances
+## CLI commands
 
-A single-page index of every `ferm-doe` subcommand, grouped by lifecycle stage, is at [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md). The snippets below are the most useful one-liners.
+A single-page index of every `ferm-doe` subcommand, grouped by lifecycle stage, is at [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md). The snippets below cover common tasks.
 
 ```bash
 # short summary instead of the full check list
@@ -609,7 +611,7 @@ ferm-doe analyze examples/demo-pb-screening-public \
   --md-out /tmp/analysis.md \
   --seed 0
 
-# compose every available artifact into one shippable run-packet markdown
+# compose every available artifact into one review-ready planning packet in Markdown
 ferm-doe finalize examples/demo-pb-screening-public \
   --out /tmp/run_packet.md \
   --json-out /tmp/run_packet.json \
@@ -646,7 +648,7 @@ ferm-doe engine utility check-deps
 
 ## Optional extras
 
-Install only what your campaign needs. Each extra is independently routable; the skill falls back to a stdlib path when the extra is absent. For a capability-centric view ("I want to do X, which extra activates it"), see [`docs/ADAPTER_MAP.md`](docs/ADAPTER_MAP.md). For honest depth on each backend (quantitative leak counts, OMLT-supersedes-ENTMOOT, BoFire main currency note), see [`docs/BACKEND_EVAL_FINDINGS.md`](docs/BACKEND_EVAL_FINDINGS.md); for the load-bearing adapter design decisions (encodings, posterior wraps, optimizer knobs), see [`docs/ADAPTER_DESIGN_NOTES.md`](docs/ADAPTER_DESIGN_NOTES.md).
+Install only what your campaign needs. Each extra is independently routable; the skill falls back to a stdlib path when the extra is absent. For a capability-centric view ("I want to do X, which extra activates it"), see [`docs/ADAPTER_MAP.md`](docs/ADAPTER_MAP.md). For backend findings, routing limits, and adapter design decisions, see [`docs/BACKEND_EVAL_FINDINGS.md`](docs/BACKEND_EVAL_FINDINGS.md) and [`docs/ADAPTER_DESIGN_NOTES.md`](docs/ADAPTER_DESIGN_NOTES.md).
 
 Which engine for which problem:
 
@@ -657,7 +659,7 @@ flowchart TB
   Q -->|"linear / total-mass /<br/>cost-blend constraints"| BF("BoFire DoEStrategy"):::proc
   Q -->|"multi-fidelity<br/>scale-bridge"| BF2("BoFire MultiFidelity"):::proc
   Q -->|"GP Bayesian follow-up<br/>(qEI / qUCB)"| BT("BoTorch"):::proc
-  Q -->|"NChooseK cardinality<br/>in BO, not just DoE"| EM("ENTMOOT v2<br/>Sobo+NChooseK stalls #450"):::gate
+  Q -->|"NChooseK cardinality<br/>in BO, not just DoE"| EM("ENTMOOT v2 or OMLT<br/>MIP-backed route"):::gate
   Q -->|"hard constraints,<br/>MIP surrogate"| OM("OMLT"):::proc
   Q -->|"very low data,<br/>sequential"| TP("TabPFN (token-gated)"):::go
   classDef hero fill:#1b1b18,stroke:#d9d2c0,color:#ffffff,stroke-width:1.5px;
@@ -673,7 +675,7 @@ flowchart TB
 | `botorch` | `pip install biosymphony-ferm-doe[botorch]` | Gaussian-process Bayesian optimization for follow-up planning in `plan-wave2` |
 | `bofire` | `pip install biosymphony-ferm-doe[bofire]` | `DoEStrategy`, `SoboStrategy`, `MultiFidelityVarianceBasedStrategy` routing for constrained DoE and BO |
 | `entmoot` | `pip install biosymphony-ferm-doe[entmoot]` | NChooseK Bayesian optimization via ENTMOOT v2 (cardinality-aware) |
-| `omlt` | `pip install biosymphony-ferm-doe[omlt]` | MIP-optimized surrogate planning over linear and NChooseK constraints |
+| `omlt` | `pip install biosymphony-ferm-doe[omlt]` | MIP-based surrogate planning over linear and NChooseK constraints |
 | `tabpfn` | `pip install biosymphony-ferm-doe[tabpfn]` | Token-gated foundation-model surrogate route for low-data sequential planning |
 | `backend-eval` | `pip install biosymphony-ferm-doe[backend-eval]` | BayBE and Ax imports for backend comparison fixtures |
 | `sensitivity` | `pip install biosymphony-ferm-doe[sensitivity]` | SALib sensitivity analysis on result rows |
@@ -686,7 +688,7 @@ flowchart TB
 A. Yes. `ferm-doe generate-design` emits a first-batch design CSV directly from the campaign manifest, stdlib only, no external generator required. Supported families and claim levels: `full_factorial`, `fractional_factorial`, `plackett_burman` (n in {8, 12, 16, 20, 24}), `definitive_screening` (k in {3..6, 9, 10}), `central_composite` (face-centered, rotatable, orthogonal), `box_behnken` (k in {3, 4}), `latin_hypercube`, and `scheffe_mixture` are emitted at `claim_level: exact`. `optimal_d`, `optimal_i`, and `extreme_vertices_mixture` use coordinate exchange or constraint enumeration and are labeled `heuristic`; review with a statistician before expensive runs. Follow-up candidate rows come from `ferm-doe plan-wave2` under `claim_level: planned_wave2_design`. Every row in every output carries the claim level so a statistician can see exactly how rigorously the matrix was produced.
 
 **Q. Does this adapt after the first batch?**
-A. Yes, in planning mode. `ferm-doe plan-wave2` joins trusted, QC-passing result rows, evaluates assay-power policy, writes negative memory and learning artifacts, and recommends `confirm`, `narrow`, `expand`, `pause`, `stop`, or a bridge-gated `scale_or_downscale` plan for the next experiment round. With `--backend botorch`, it routes through a Gaussian-process surrogate and an acquisition function (qEI or qUCB) for `n_candidates` follow-up points. Outputs are labeled `planned_wave2_design` or `bayesian_optimization_planned`, not validated optimization. The next batch is chosen from the data, not pre-scripted:
+A. Yes, in planning mode. `ferm-doe plan-wave2` joins trusted, QC-passing result rows, evaluates assay-power policy, writes negative memory and learning artifacts, and recommends `confirm`, `narrow`, `expand`, `pause`, `stop`, or a bridge-gated `scale_or_downscale` plan for the next experiment round. With `--backend botorch`, it routes through a Gaussian-process surrogate and an acquisition function (qEI or qUCB) for `n_candidates` follow-up points. Outputs are labeled `planned_wave2_design` or `bayesian_optimization_planned`, not validated optimization. The proposed next batch is derived from supplied data rather than a fixed script:
 
 ```mermaid
 flowchart TB
@@ -708,7 +710,7 @@ flowchart TB
 A. See [`docs/BOFIRE_POSITIONING.md`](docs/BOFIRE_POSITIONING.md). Short version: stdlib for unconstrained or simple-box screening and adaptive follow-up planning; BoFire for linear or nonlinear constraint blends (cost, total-mass, NChooseK) and for multi-fidelity scale-bridge planning. The BoFire adapter degrades to a "not_available" report when the extra is absent, so smoke scripts run on any laptop.
 
 **Q. When do I route to ENTMOOT instead of BoFire?**
-A. When NChooseK cardinality is load-bearing in Bayesian optimization (not just initial DoE). BoFire's `SoboStrategy` plus `NChooseK` stalls indefinitely (upstream issue #450). ENTMOOT v2 with `min_count` constraints is the documented swap. See [`docs/ENTMOOT_SWAP_DESIGN.md`](docs/ENTMOOT_SWAP_DESIGN.md).
+A. When NChooseK cardinality is load-bearing in Bayesian optimization, not just the initial DoE. The repository's BoFire 0.3.1 audit found that `SoboStrategy` plus `NChooseK` did not return candidates. Upstream issue #450 is now closed, but later BoFire releases have not been evaluated against this adapter. ENTMOOT and OMLT remain the conservative MIP-backed routes. See [`docs/ENTMOOT_SWAP_DESIGN.md`](docs/ENTMOOT_SWAP_DESIGN.md).
 
 **Q. What about BayBE, Ax, OMLT, and TabPFN?**
 A. They are optional evaluation routes that keep the campaign manifest as the source of state. See [`docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md`](docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md). BoFire remains the default constrained static DoE/BO route. BayBE is a low-data and hybrid-space comparison target; Ax/BoTorch is for custom modeling or trial lifecycle pilots; OMLT is a MIP-surrogate route for hard constraints; TabPFN is a token-gated low-data surrogate experiment.
@@ -720,7 +722,7 @@ A. The demos use synthetic placeholder data with `readiness_expectation: YELLOW`
 A. Yes. The schema is organism-agnostic. Scale-bridge criteria like P/V and tip speed are common for shear-sensitive mammalian work; kLa is more common for microbial. See [`docs/SCALE_BRIDGE.md`](docs/SCALE_BRIDGE.md).
 
 **Q. How is this different from a Jupyter notebook with pyDOE3?**
-A. Notebooks generate designs but do not gate readiness or carry durable state for a long-running agent. This repo is the manifest layer that sits above a notebook or commercial DoE tool, plus the literature-aware planning loop, plus the readiness gates.
+A. Notebooks generate designs but do not necessarily provide readiness checks or durable state for a long-running agent. This repo is the manifest layer that sits above a notebook or commercial DoE tool, plus the evidence-aware planning loop and readiness checks.
 
 **Q. Is the skill stateful or stateless?**
 A. The skill itself is stateless. State lives in the campaign manifest file. The agent that uses the skill is responsible for persisting and updating that file across turns.
@@ -732,7 +734,7 @@ A. Yes. The CLI runs standalone, and a scientist can call `ferm-doe validate`, `
 A. GxP batch records require a separately-validated execution pipeline. This tool covers the planning step that feeds one. See [`NON_CLAIMS.md`](NON_CLAIMS.md).
 
 **Q. Can I use private data with this skill?**
-A. Yes, but keep private campaigns in a separate non-public workspace and do not commit them here. `claim_level` is a provenance label, not a sanitization control; scanners, release checks, and secret checks still apply before anything is shared.
+A. Yes. Keep private campaigns in a separate non-public workspace and do not commit them here. `claim_level` is a provenance label, not a sanitization control; scanners, release checks, and secret checks still apply before anything is shared.
 
 **Q. What does "long-running agent" mean concretely?**
 A. An agent session that spans hours or days, accumulates context, may pause and resume, and may hand off to other agents or humans. Examples: a Claude Code session driving a multi-week design effort; a Codex worker that tracks a Linear project; a custom orchestrator running between waves.
@@ -749,7 +751,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md). Public-safe synthetic demos are welcom
 
 In bioprocess work, the expensive failure is the well-formatted experiment that cannot answer its scientific question.
 
-`biosymphony-ferm-doe` checks whether a fermentation campaign is measurable, runnable, and worth running before the lab spends time and materials.
+`biosymphony-ferm-doe` assesses whether a fermentation campaign is measurable, feasible under its declared constraints, and worth considering before the lab spends time and materials.
 
 ## License
 

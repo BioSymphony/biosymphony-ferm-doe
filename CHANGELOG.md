@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/), with pre-alpha tags through `0.x`.
 
+## [Unreleased] - 2026-08-30 tool and documentation refresh
+
+### Added
+
+- Registry checks now reject non-public source paths, missing documentation paths, unsynchronized public mirrors, optional extras without registry coverage, and adapter route or claim drift.
+- Restricted adaptive backends now require an explicit license gate. TabPFN records separate terms for the code, v2 weights, and default TabPFN-3 weights.
+
+### Changed
+
+- Refreshed all 49 registry entries against current official package or repository information. The generated registry now separates the repository's supported requirement from the latest observed upstream release.
+- Added SciPy and Plotly to the registry and corrected BoTorch, SALib, pyDOE3, Nox, Frictionless, RO-Crate, GROBID, Atlas, and related tool records.
+- Replaced the mutable BoFire `main` dependency in the separate NChooseK DoE evaluation extra with a Python 3.11 or newer BoFire 0.4.1 pin. The primary verified BoFire adapter remains on `>=0.3.1,<0.4`.
+- Marked the May 2026 BoFire and backend findings as dated compatibility evidence. Closed upstream issues no longer appear as current failures, and no later-release compatibility is implied.
+- Tightened README, skill, reference, and demo language around readiness, scale transfer, optimization, execution, and backend comparisons.
+
 ## [Unreleased] - 2026-05-26 public-launch polish
 
 ### Changed
@@ -53,7 +68,7 @@ All notable changes to this project will be documented here. Format follows [Kee
 - Six reference docs wired into `docs/README.md`: `GLOSSARY.md` (campaign, profile, claim level, scale context, NChooseK, kLa, and the rest), `CLI_REFERENCE.md` (single-page index of every `ferm-doe` subcommand grouped by lifecycle stage), `ADAPTER_MAP.md` (capability-centric "I want to do X → install Y → CLI Z" map), `DOE_FAMILY_RECIPES.md` (manifest-patch recipes for swapping `doe.family` across the 14 supported generators), `WAVE2_BOTORCH.md` (qEI / qUCB walkthrough with documented short-circuit reasons), `ISSUE_PACK_GENERATION.md` (runbook for `engine generate-issue-pack` with Symphony, Claude Code + Linear, and generic-orchestrator integration patterns).
 - Three campaign-shaped public examples: `examples/reference-doe-custom-design/` (custom constrained fixture for reference-DoE parity checks), `examples/yeast-isoprenoid-2l-fedbatch/` (product-class starter for a hydrophobic-product 2 L fed-batch case with derived productivity and cost responses), `examples/xylanase-wxz1-2012/` (public-paper-derived starter from Cui & Zhao 2012, DOI 10.3390/ijms130810630, CC BY 3.0, normalized into the manifest contract).
 - `make help` target listing every common make target with a one-line summary, grouped by sharing gate, tests/validators, inspect, optional smokes, public-safety scans, and housekeeping.
-- Two backend-depth docs that give the public adapter list explicit findings rather than implicit parity: `docs/BACKEND_EVAL_FINDINGS.md` (quantitative 6-fixture sweep, OMLT-supersedes-ENTMOOT as cardinality workhorse, BoFire main currency note showing PRs #747/#753 do not close the NChooseK trap and issue #450 still active) and `docs/ADAPTER_DESIGN_NOTES.md` (OMLT lower-coupling fix, TabPFN Gaussian-approximation posterior wrap + sample-then-rank acquisition, ENTMOOT binary-vs-lab-semantic definition correction, cost-weighting trap pattern for BoTorch wrappers, MO BO `sequential=True` RAM lever and env-knob defaults). Both new docs are in the public-release scan allowlist; release-check stays green.
+- Two backend-depth docs recorded the May 2026 evaluation: `docs/BACKEND_EVAL_FINDINGS.md` covered the six-fixture results, and `docs/ADAPTER_DESIGN_NOTES.md` documented the OMLT coupling rule, TabPFN posterior approximation, ENTMOOT cardinality semantics, BoTorch cost-weighting risk, and multi-objective memory controls. These entries describe the evaluation state on that date; later upstream status appears in the current tool registry.
 - Depth-ladder section added to `docs/BIOMANUFACTURING_ADAPTIVE_BACKENDS.md` ("How Deep Does Each Route Go In This Repo") that explicitly maps backends to tiers (worked exemplar, documented route + smoke + findings, documented route only, comparison-surface target, registry listing) so the "37 tools, 9 adapters" framing does not read as implicit parity.
 
 ### Changed

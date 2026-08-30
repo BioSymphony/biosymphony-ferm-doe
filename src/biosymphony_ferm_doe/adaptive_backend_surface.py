@@ -174,7 +174,20 @@ def _validate_candidate(
         license_text = str(registry[tool_id].get("license") or "")
         normalized = _normalize_license(license_text)
         if normalized not in PERMISSIVE_LICENSES:
-            findings.append(SurfaceFinding("error", tool_id, f"license is not in permissive allowlist: {license_text}"))
+            license_gate = candidate.get("license_gate")
+            if (
+                not isinstance(license_gate, dict)
+                or license_gate.get("required") is not True
+                or not str(license_gate.get("restriction") or "").strip()
+                or not str(license_gate.get("action") or "").strip()
+            ):
+                findings.append(
+                    SurfaceFinding(
+                        "error",
+                        tool_id,
+                        f"restricted license requires an explicit license_gate: {license_text}",
+                    )
+                )
         registry_extra = str(registry[tool_id].get("pyproject_extra") or "")
         candidate_extra = str(candidate.get("install_extra") or "")
         if registry_extra and candidate_extra and registry_extra != candidate_extra:

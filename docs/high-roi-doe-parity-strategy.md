@@ -13,11 +13,11 @@ Commercial DOE tools are strong after the problem has been statistically framed.
 - turn vessel, sampling, reagent, analytics, and staffing reality into constraints
 - separate plate/flask/reactor arms and phase-specific factors
 - gather evidence and prior-run caveats
-- produce a runnable experiment packet
+- produce a planning packet for lab review
 - pre-register what follow-up will do with results
 - export clean DOE tables when commercial software or statistician review is appropriate
 
-Local DOE generation is a fast planning path. It should be useful, deterministic, and honest about exact versus approximate metrics. It should not claim JMP/Design-Expert/Modde parity unless a method is adapter-backed and validated.
+Local DOE generation is a fast planning path. It should be useful, deterministic, and honest about exact versus approximate metrics. It should not claim JMP/Design-Expert/Modde parity unless a matching method is adapter-backed and the parity evidence is documented.
 
 ## Highest-ROI Work
 
@@ -99,7 +99,7 @@ Defer these unless a real campaign forces them:
 Before adding DOE capability, ask:
 
 1. Will this prevent a bad experiment?
-2. Will it make a design physically more runnable?
+2. Will it make a design more feasible under its stated constraints?
 3. Will it clarify a response, assay, constraint, or scale-transfer assumption?
 4. Will it produce a proof artifact a scientist/statistician can audit?
 5. Will it improve follow-up decisions after results arrive?

@@ -1,28 +1,28 @@
 {
   "schema_version": 1,
   "surface_kind": "biosymphony_biomanufacturing_adaptive_backend_selection",
-  "last_checked": "2026-05-23",
+  "last_checked": "2026-08-30",
   "status": "public_evaluation_surface",
-  "free_open_source_summary": [
+  "backend_license_summary": [
     {
       "tool_id": "bofire",
       "license": "BSD-3-Clause",
-      "current_signal": "GitHub pushed 2026-05-21; PyPI 0.3.1; primary optional constrained DoE/BO adapter"
+      "current_signal": "Upstream 0.5.0; primary optional adapter remains on the evaluated >=0.3.1,<0.4 range"
     },
     {
       "tool_id": "baybe",
       "license": "Apache-2.0",
-      "current_signal": "GitHub pushed 2026-05-21; PyPI 0.14.3; Python >=3.10,<3.14; evaluate next for low-data and hybrid campaigns"
+      "current_signal": "Upstream 0.15.0; evaluation extra remains pinned to 0.14.3 because 0.15 includes breaking changes"
     },
     {
       "tool_id": "botorch",
       "license": "MIT",
-      "current_signal": "GitHub pushed 2026-05-21; PyPI 0.17.2; low-level expert BO substrate"
+      "current_signal": "Upstream 0.18.1; repository adapter retains its existing supported range pending evaluation"
     },
     {
       "tool_id": "ax",
       "license": "MIT",
-      "current_signal": "GitHub pushed 2026-05-18; PyPI ax-platform 1.2.4; evaluate as orchestration/custom-modeling fallback"
+      "current_signal": "Upstream ax-platform 1.3.1; evaluation extra remains pinned to 1.2.4"
     },
     {
       "tool_id": "entmoot",
@@ -36,8 +36,8 @@
     },
     {
       "tool_id": "tabpfn_v2",
-      "license": "Apache-2.0",
-      "current_signal": "PyPI tabpfn 8.0.3 verified 2026-05-23; token-gated low-data surrogate route"
+      "license": "Prior Labs License for code and v2 weights; non-commercial license for default TabPFN-3 weights",
+      "current_signal": "Upstream 8.5.0; repository adapter supports >=8,<9 and requires a runtime token for noninteractive use"
     }
   ],
   "owned_by_biosymphony": [
@@ -294,6 +294,11 @@
         "non-commercial terms require review",
         "posterior is approximated for BoTorch acquisition use"
       ],
+      "license_gate": {
+        "required": true,
+        "restriction": "Default TabPFN-3 weights are licensed for non-commercial use; code and v2 weights use the Prior Labs License.",
+        "action": "Review the applicable code and model-weight terms before enabling this route."
+      },
       "smoke_contract": {
         "minimum_surface": "route_report_plus_candidate_table",
         "must_check": [

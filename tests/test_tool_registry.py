@@ -31,6 +31,12 @@ class ToolRegistryTests(unittest.TestCase):
         self.assertIn("bofire_route", {rule["rule_id"] for rule in data["decision_rules"]})
         self.assertTrue(report["pyproject_alignment"]["checked"])
         self.assertGreater(report["pyproject_alignment"]["packages_checked"], 0)
+        self.assertEqual(
+            report["pyproject_alignment"]["covered_extras"],
+            report["pyproject_alignment"]["extras"],
+        )
+        self.assertEqual(report["public_path_check"]["mirror_count"], 3)
+        self.assertGreater(report["public_path_check"]["source_count"], 0)
         self.assertIn("adaptive_smoke", report["action_lane_check"]["nox_sessions"])
 
     def test_copyleft_adoption_is_blocked(self) -> None:
@@ -108,10 +114,41 @@ class ToolRegistryTests(unittest.TestCase):
         self.assertEqual(report["status"], "FAIL")
         self.assertTrue(any("missing nox session" in finding["message"] for finding in report["findings"]))
 
+    def test_pyproject_alignment_blocks_unregistered_extra_package(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            registry_path = root / "tool-registry.json"
+            pyproject_path = root / "pyproject.toml"
+            registry_path.write_text(json.dumps(_minimal_registry([_tool("bofire", package="bofire>=0.3.1", pyproject_extra="bofire")])))
+            pyproject_path.write_text(
+                "\n".join(
+                    [
+                        "[project]",
+                        'name = "demo"',
+                        "[project.optional-dependencies]",
+                        'bofire = ["bofire>=0.3.1"]',
+                        'report = ["plotly>=6.0"]',
+                    ]
+                )
+            )
+            report = validate_tool_registry(registry_path, today=date(2026, 5, 15), pyproject_path=pyproject_path)
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(any("no matching registry package: report" in finding["message"] for finding in report["findings"]))
+
+    def test_non_public_source_path_is_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "tool-registry.json"
+            registry = _minimal_registry([_tool("bofire")])
+            registry["source_notes"] = [".runtime/research/notes.md"]
+            path.write_text(json.dumps(registry))
+            report = validate_tool_registry(path, today=date(2026, 5, 15))
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(any("public repository surface" in finding["message"] for finding in report["findings"]))
+
     def test_bofire_route_reasons_must_match_adapter_constants(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             registry_path = Path(tmp) / "tool-registry.json"
-            registry_path.write_text(json.dumps(_minimal_registry([_tool("bofire", route=["non_box_constraints"])])))
+            registry_path.write_text(json.dumps(_minimal_registry([_tool("bofire", route_reasons=["non_box_constraints"])])))
             report = validate_tool_registry(registry_path, today=date(2026, 5, 15))
         self.assertEqual(report["status"], "FAIL")
         self.assertTrue(any("route reasons drifted" in finding["message"] for finding in report["findings"]))
@@ -128,7 +165,10 @@ class ToolRegistryTests(unittest.TestCase):
             self.assertEqual(report["status"], "PASS")
             self.assertIn("BioSymphony Tool Registry", md_out.read_text())
             self.assertIn('"tools"', stdout.getvalue())
-            self.assertIn("bofire", render_tool_registry_markdown(report, ROOT / "docs" / "tool-registry.json"))
+            markdown = render_tool_registry_markdown(report, ROOT / "docs" / "tool-registry.json")
+            self.assertIn("bofire", markdown)
+            self.assertEqual(markdown.count("- Status:"), 1)
+            self.assertIn("| Tool | Priority | Status | Supported | Upstream | Checked |", markdown)
 
     def test_dependency_status_includes_registry_install_hints(self) -> None:
         status = dependency_status()
@@ -138,6 +178,9 @@ class ToolRegistryTests(unittest.TestCase):
         self.assertEqual(status["evaluation_backends"]["omlt"]["install_extra"], "omlt")
         self.assertEqual(status["evaluation_backends"]["tabpfn"]["install_extra"], "tabpfn")
         self.assertEqual(status["evaluation_backends"]["tabpfn"]["runtime_token_env_var"], "TABPFN_TOKEN")
+        self.assertEqual(status["optional_capabilities"]["plotly"]["install_extra"], "report")
+        self.assertEqual(status["optional_capabilities"]["salib"]["install_extra"], "sensitivity")
+        self.assertEqual(status["optional_capabilities"]["frictionless"]["install_extra"], "contracts")
 
     def test_doctor_cli_reports_repo_capabilities(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -166,6 +209,7 @@ def _tool(
     pyproject_extra: str = "",
     local_lane: str = "",
     route: list[str] | None = None,
+    route_reasons: list[str] | None = None,
 ) -> dict[str, object]:
     tool: dict[str, object] = {
         "tool_id": tool_id,
@@ -181,9 +225,16 @@ def _tool(
         "fit": "test",
         "risks": "test",
         "route": route if route is not None else ["non_box_constraints", "multi_objective_responses", "scale_fidelity_structure", "operator_requested_bofire"],
-        "claim_level": "test",
+        "claim_level": "bofire_adapter_planning" if tool_id == "bofire" else "test",
         "fail_closed_behavior": "test",
     }
+    if tool_id == "bofire":
+        tool["route_reasons"] = route_reasons if route_reasons is not None else [
+            "non_box_constraints",
+            "multi_objective_responses",
+            "scale_fidelity_structure",
+            "operator_requested_bofire",
+        ]
     if package:
         tool["package"] = package
     if pyproject_extra:

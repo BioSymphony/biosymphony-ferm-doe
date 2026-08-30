@@ -1,6 +1,6 @@
-# BioSymphony Ferm DoE Superpowers
+# BioSymphony Ferm DoE Capabilities
 
-## Executable Capability Index
+## Capability Index
 
 | Capability | Public command or artifact | Demo path | Claim boundary |
 |---|---|---|---|
@@ -10,8 +10,8 @@
 | Factor universe and evidence | `ferm-doe engine compile-swarm-plan ...` | `examples/yeast-isoprenoid-2l-fedbatch/` | Evidence rows influence planning; they are not target-specific proof |
 | Feasibility and scale bridge | `ferm-doe scale-recipe ...` and `ferm-doe bridge-qualification ...` | `examples/demo-scale-bridge-public/` | Engineering planning; bridge success requires later joined result evidence |
 | Design tournament | `ferm-doe engine compare-designs ...` | `examples/reference-doe-custom-design/` | Candidate selection with explicit claim labels |
-| follow-up memory | `ferm-doe plan-wave2 ... --results ...` | `examples/demo-pb-screening-public/` | Planned next-experiment-round candidates only |
-| Run packet compiler | `ferm-doe finalize ... --out run_packet.md` | `examples/demo-pb-screening-public/` | Shippable planning packet, not a batch record |
+| Follow-up memory | `ferm-doe plan-wave2 ... --results ...` | `examples/demo-pb-screening-public/` | Planned next-experiment-round candidates only |
+| Run packet compiler | `ferm-doe finalize ... --out run_packet.md` | `examples/demo-pb-screening-public/` | Review-ready planning packet, not a batch record |
 | Agent work graph | `ferm-doe engine generate-issue-pack ...` | `examples/reference-doe-custom-design/` | Bounded work packets for humans, agents, or trackers |
 | Linear handoff | `agents/linear.md` conventions | `docs/WORKFLOWS.md` | Tracker status and comments mirror local artifacts |
 | Cloud wrappers | `deploy/aws-lambda/`, `deploy/modal/` | `deploy/README.md` | Stateless API endpoints around local commands |
@@ -20,7 +20,7 @@
 
 ## 1. Readiness Verdict
 
-The system should decide whether a campaign is actually ready to run. It is high value because the most expensive mistake is a well-formatted experiment that cannot answer the scientific question.
+The system should help decide whether a campaign is ready for review and, later, physical work. It is valuable because the most expensive mistake is a well-formatted experiment that cannot answer the scientific question.
 
 ## 2. Historical Data Rescue
 
@@ -40,7 +40,7 @@ Generate plausible process hypotheses before designing the experiment: oxygen tr
 
 ## 6. Feasibility Solver
 
-Convert ideal experimental designs into physically runnable plans. Include equipment count, working volume, run duration, sampling windows, analytics throughput, reagent quantities, blocking, randomization, staffing windows, and forbidden combinations.
+Convert ideal experimental designs into physically feasible planning candidates. Include equipment count, working volume, run duration, sampling windows, analytics throughput, reagent quantities, blocking, randomization, staffing windows, and forbidden combinations.
 
 ## 7. Design Tournament
 
@@ -53,11 +53,11 @@ Dispatch multiple design lanes:
 - low-cost scouting design
 - skeptical auditor
 
-The adjudicator selects the most informative experiment that is actually runnable.
+The adjudicator selects the most informative candidate that fits the declared constraints.
 
-## 8. Pre-Registered follow-up Rules
+## 8. Pre-Registered Follow-Up Rules
 
-first-batch should include a decision tree before results exist. Examples:
+The first batch should include a decision tree before results exist. Examples:
 
 - if response noise dominates, pause optimization and run assay/process reproducibility checks
 - if feed improves titer but harms viability, explore feed timing and oxygen transfer

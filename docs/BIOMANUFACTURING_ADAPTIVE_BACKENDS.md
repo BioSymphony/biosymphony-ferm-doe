@@ -1,6 +1,6 @@
 # Biomanufacturing Adaptive Backend Selection
 
-Status: public evaluation surface - 2026-05-23
+Status: public evaluation surface - current facts checked 2026-08-30
 
 This document records how BioSymphony Ferm DoE should evaluate open-source
 adaptive design backends for fermentation and upstream bioprocess planning.
@@ -16,21 +16,22 @@ Machine-readable companion:
 
 ## License Posture
 
-The candidate backends in this decision surface are permissively licensed:
+The candidate backends use different licenses. Review both the code license
+and any model-weight terms before enabling an optional route:
 
 | Tool | License | Repo signal checked |
 | --- | --- | --- |
-| BoFire | BSD-3-Clause | `experimental-design/bofire`, pushed 2026-05-21 |
-| BayBE | Apache-2.0 | `emdgroup/baybe`, pushed 2026-05-21 |
-| BoTorch | MIT | `meta-pytorch/botorch`, pushed 2026-05-21 |
-| Ax | MIT | `facebook/Ax`, pushed 2026-05-18 |
+| BoFire | BSD-3-Clause | Upstream 0.5.0; primary adapter remains on the evaluated `>=0.3.1,<0.4` range |
+| BayBE | Apache-2.0 | Upstream 0.15.0; evaluation extra remains pinned to 0.14.3 because 0.15 includes breaking changes |
+| BoTorch | MIT | Upstream 0.18.1; repository adapter retains its existing supported range pending evaluation |
+| Ax | MIT | Upstream 1.3.1; evaluation extra remains pinned to 1.2.4 |
 | ENTMOOT v2 | BSD-3-Clause | Already adopted behind the in-repo adapter |
 | OMLT | BSD-3-Clause | PyPI 1.2.2 checked 2026-05-23; optional MIP-over-surrogate route |
-| TabPFN | Apache-2.0 | PyPI `tabpfn` 8.0.3 checked 2026-05-23; token-gated low-data surrogate route |
+| TabPFN | Prior Labs License for code and v2 weights; non-commercial license for default TabPFN-3 weights | Upstream 8.5.0; repository adapter supports `>=8,<9` and requires a runtime token for noninteractive use |
 
-Permissive license does not mean "safe to embed without review." Any new
-adapter still needs a fixture, a fail-closed report, and a public-release audit
-before it becomes a default public route.
+A license grant does not mean "safe to embed without review." Any new adapter
+still needs a fixture, a fail-closed report, and a public-release audit before
+it becomes a default public route.
 
 ## Layering Rule
 
@@ -76,7 +77,7 @@ Use **Ax/BoTorch** when the campaign needs custom modeling or infrastructure:
 - custom acquisition functions
 - cost-aware acquisition such as EI per unit cost
 - deeper multi-fidelity modeling
-- production adaptive-experiment orchestration
+- deployment-oriented adaptive-experiment orchestration
 - custom storage or trial lifecycle control
 
 Use **ENTMOOT** for cardinality-heavy combinatorial BO when exact NChooseK
@@ -93,7 +94,7 @@ Keep **pyDOE/pyDOE3** for static classical DoE baselines and smoke fixtures.
 
 ## How Deep Does Each Route Go In This Repo
 
-"47 tools in the registry" and "9 documented adapters" can suggest parity that the repo does not actually claim. The honest depth ladder, as of 2026-06:
+The registry size and adapter count can suggest parity that the repo does not actually claim. The honest depth ladder below separates current upstream versions from the versions evaluated in this repository:
 
 | Tier | Backends | What's in this repo |
 | --- | --- | --- |
@@ -104,7 +105,7 @@ Keep **pyDOE/pyDOE3** for static classical DoE baselines and smoke fixtures.
 
 The repo does not currently have a worked-exemplar tier (a single end-to-end campaign with a cumulative dossier and a publication-style methods argument). Backends sit at the documented-route-plus-smoke depth and rely on the cross-cutting docs (BACKEND_EVAL_FINDINGS, ADAPTER_DESIGN_NOTES, BOFIRE_CONSTRAINT_PATTERNS, ENTMOOT_SWAP_DESIGN, SCALE_BRIDGE_METHODOLOGY) for the load-bearing context.
 
-The headline supersession from the 2026-05 sweep (OMLT becomes the new NChooseK cardinality workhorse for BO; BoFire main does not collapse the MIP-based BO slot; ENTMOOT v2 stays valid for existing rigs with a one-line patch) is documented in [`BACKEND_EVAL_FINDINGS.md`](BACKEND_EVAL_FINDINGS.md). The non-obvious adapter design decisions that make those findings reproducible (OMLT lower-coupling, TabPFN Gaussian-approximation posterior wrap, the BoTorch direct cost-weighting trap, the MO BO sequential-mode RAM lever) live in [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md).
+The May 2026 sweep's OMLT, ENTMOOT, and BoFire findings are documented in [`BACKEND_EVAL_FINDINGS.md`](BACKEND_EVAL_FINDINGS.md). The non-obvious adapter design decisions that make those findings reproducible (OMLT lower-coupling, TabPFN Gaussian-approximation posterior wrap, the BoTorch direct cost-weighting trap, the MO BO sequential-mode RAM lever) live in [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md).
 
 ## What Not To Do
 
@@ -155,7 +156,7 @@ proves the emitted candidates satisfy the relevant BioSymphony contract.
 
 ## First Fixture Campaigns
 
-Runnable starter fixture plans live under `examples/adaptive-backend-eval/<scenario_id>/`.
+Starter fixture plans live under `examples/adaptive-backend-eval/<scenario_id>/`.
 Each directory has a synthetic `campaign_manifest.json`, a small prior-run CSV,
 and a `smoke_plan.json` that names expected artifacts under `.runtime/`.
 

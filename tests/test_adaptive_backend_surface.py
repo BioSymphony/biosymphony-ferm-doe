@@ -21,6 +21,7 @@ class AdaptiveBackendSurfaceTests(unittest.TestCase):
         by_id = {candidate["tool_id"]: candidate for candidate in data["backend_candidates"]}
         self.assertEqual(by_id["bofire"]["default_position"], "default_for_static_constrained_doe_bo")
         self.assertEqual(by_id["baybe"]["default_position"], "evaluate_next")
+        self.assertTrue(by_id["tabpfn_v2"]["license_gate"]["required"])
         self.assertIn("scale_bridge", set(data["owned_by_biosymphony"]))
         self.assertIn("response_semantics", set(data["owned_by_biosymphony"]))
         self.assertIn("readiness_verdict", set(data["owned_by_biosymphony"]))
@@ -57,6 +58,17 @@ class AdaptiveBackendSurfaceTests(unittest.TestCase):
             report = validate_surface(path)
         self.assertEqual(report["status"], "FAIL")
         self.assertTrue(any("baybe" in finding["item_id"] for finding in report["findings"]))
+
+    def test_restricted_backend_requires_explicit_license_gate(self) -> None:
+        data = json.loads((ROOT / "docs" / "adaptive-backend-evaluation.json").read_text())
+        tabpfn = next(candidate for candidate in data["backend_candidates"] if candidate["tool_id"] == "tabpfn_v2")
+        tabpfn.pop("license_gate")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "surface.json"
+            path.write_text(json.dumps(data))
+            report = validate_surface(path)
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(any("explicit license_gate" in finding["message"] for finding in report["findings"]))
 
     def test_unknown_scenario_tool_fails(self) -> None:
         data = json.loads((ROOT / "docs" / "adaptive-backend-evaluation.json").read_text())

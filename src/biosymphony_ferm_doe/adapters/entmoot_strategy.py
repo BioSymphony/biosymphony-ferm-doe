@@ -10,13 +10,12 @@
     ``docs/ADAPTER_DESIGN_NOTES.md`` and ``docs/BACKEND_EVAL_FINDINGS.md``
     for the full diagnosis and the recommended one-line patch.
 
-ENTMOOT is the Phase 2 BO swap for any campaign manifest that carries a
-:class:`NChooseKConstraint`. BoFire's ``SoboStrategy`` stalls on those (see
-upstream issue #450 — ``RandomStrategy._sample_with_nchoosek`` enumerates
-combinatorial seeds and never terminates). ENTMOOT encodes the cardinality
-bound as a hard MIP constraint inside the acquisition optimization via
-Pyomo + HiGHS, so the same question becomes feasible-by-construction
-instead of a rejection-sampling problem.
+ENTMOOT is a conservative BO route for campaign manifests that carry a
+:class:`NChooseKConstraint`. The repository's BoFire 0.3.1 audit found that
+``SoboStrategy`` did not return for that shape. Upstream issue #450 is now
+closed, but later BoFire tags have not been evaluated against this adapter.
+ENTMOOT encodes the cardinality bound as a hard MIP constraint inside the
+acquisition optimization via Pyomo + HiGHS.
 
 Three documented risks (``docs/ENTMOOT_SWAP_DESIGN.md``) are closed in this
 adapter:

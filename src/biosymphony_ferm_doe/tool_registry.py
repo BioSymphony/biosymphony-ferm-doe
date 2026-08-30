@@ -22,6 +22,7 @@ from typing import Any
 
 DEFAULT_REGISTRY = Path("docs/tool-registry.json")
 ACTIVE_STATUSES = {"adopted_optional", "evaluate_next"}
+PACKAGE_ALIGNMENT_STATUSES = ACTIVE_STATUSES | {"compatibility_only"}
 VALID_PRIORITIES = {"P0", "P1", "P2", "P3", "Watch", "Avoid"}
 VALID_STATUSES = {
     "adopted_optional",
@@ -139,9 +140,11 @@ def validate_tool_registry(
         required=noxfile_path is not None,
     )
     route_check = validate_route_alignment(valid_tools)
+    public_path_check = validate_public_paths(data, valid_tools, root=root, registry_path=registry_path)
     findings.extend(alignment.pop("findings"))
     findings.extend(lane_check.pop("findings"))
     findings.extend(route_check.pop("findings"))
+    findings.extend(public_path_check.pop("findings"))
 
     errors = [finding for finding in findings if finding.severity == "error"]
     warnings = [finding for finding in findings if finding.severity == "warning"]
@@ -160,6 +163,7 @@ def validate_tool_registry(
         "pyproject_alignment": alignment,
         "action_lane_check": lane_check,
         "route_rule_check": route_check,
+        "public_path_check": public_path_check,
         "findings": [finding.to_dict() for finding in findings],
     }
 
@@ -215,6 +219,7 @@ def validate_pyproject_alignment(tools: list[dict[str, Any]], pyproject_path: Pa
         "checked": False,
         "path": str(pyproject_path),
         "extras": [],
+        "covered_extras": [],
         "packages_checked": 0,
         "findings": findings,
     }
@@ -242,24 +247,32 @@ def validate_pyproject_alignment(tools: list[dict[str, Any]], pyproject_path: Pa
         if isinstance(requirements, list)
     }
 
+    registry_packages: set[str] = set()
     for tool in tools:
         tool_id = str(tool.get("tool_id") or "_unknown")
         status = str(tool.get("status") or "")
         package = str(tool.get("package") or "").strip()
         extra = str(tool.get("pyproject_extra") or "").strip()
-        if status not in ACTIVE_STATUSES:
+        if status not in PACKAGE_ALIGNMENT_STATUSES:
             continue
+        package_name = _requirement_name(package)
+        if package_name:
+            registry_packages.add(package_name)
         if package and not extra:
             findings.append(RegistryFinding("error", tool_id, "active tool declares package but no pyproject_extra"))
             continue
         if not package or not extra:
             continue
         result["packages_checked"] += 1
-        package_name = _requirement_name(package)
         if extra not in extra_packages:
             findings.append(RegistryFinding("error", tool_id, f"pyproject extra is missing: {extra}"))
         elif package_name not in extra_packages[extra]:
             findings.append(RegistryFinding("error", tool_id, f"package {package_name} is not listed in pyproject extra {extra}"))
+
+    covered_extras = sorted(extra for extra, packages in extra_packages.items() if packages & registry_packages)
+    result["covered_extras"] = covered_extras
+    for extra in sorted(set(extra_packages) - set(covered_extras)):
+        findings.append(RegistryFinding("error", "_registry", f"pyproject extra has no matching registry package: {extra}"))
     return result
 
 
@@ -309,19 +322,42 @@ def validate_action_lanes(tools: list[dict[str, Any]], *, root: Path, noxfile_pa
 
 
 def validate_route_alignment(tools: list[dict[str, Any]]) -> dict[str, Any]:
-    from .adapters.bofire_strategy import BOFIRE_ROUTE_REASONS
+    from .adapters.bofire_strategy import BOFIRE_ROUTE_REASONS, CLAIM_LEVEL as BOFIRE_CLAIM_LEVEL
+    from .adapters.entmoot_strategy import ENTMOOT_ROUTE_REASONS, CLAIM_LEVEL as ENTMOOT_CLAIM_LEVEL
+    from .adapters.omlt_strategy import OMLT_ROUTE_REASONS, CLAIM_LEVEL as OMLT_CLAIM_LEVEL
+    from .adapters.tabpfn_strategy import TABPFN_ROUTE_REASONS, CLAIM_LEVEL as TABPFN_CLAIM_LEVEL
 
     findings: list[RegistryFinding] = []
-    expected = set(BOFIRE_ROUTE_REASONS)
+    expected_by_tool = {
+        "bofire": (BOFIRE_CLAIM_LEVEL, BOFIRE_ROUTE_REASONS),
+        "entmoot": (ENTMOOT_CLAIM_LEVEL, ENTMOOT_ROUTE_REASONS),
+        "omlt": (OMLT_CLAIM_LEVEL, OMLT_ROUTE_REASONS),
+        "tabpfn_v2": (TABPFN_CLAIM_LEVEL, TABPFN_ROUTE_REASONS),
+    }
     result: dict[str, Any] = {
         "checked": True,
-        "bofire_expected_route_reasons": list(BOFIRE_ROUTE_REASONS),
+        "expected": {
+            tool_id: {"claim_level": claim_level, "route_reasons": list(route_reasons)}
+            for tool_id, (claim_level, route_reasons) in expected_by_tool.items()
+        },
         "findings": findings,
     }
     for tool in tools:
-        if tool.get("tool_id") != "bofire":
+        tool_id = str(tool.get("tool_id") or "")
+        if tool_id not in expected_by_tool:
             continue
-        actual = set(str(item) for item in tool.get("route", []) if item)
+        expected_claim, expected_reasons = expected_by_tool[tool_id]
+        actual_claim = str(tool.get("runtime_claim_level") or tool.get("claim_level") or "")
+        if actual_claim != expected_claim:
+            findings.append(
+                RegistryFinding(
+                    "error",
+                    tool_id,
+                    f"runtime claim level drifted from adapter constant: expected {expected_claim}, got {actual_claim}",
+                )
+            )
+        expected = set(expected_reasons)
+        actual = set(str(item) for item in tool.get("route_reasons", []) if item)
         if actual != expected:
             missing = sorted(expected - actual)
             extra = sorted(actual - expected)
@@ -330,8 +366,88 @@ def validate_route_alignment(tools: list[dict[str, Any]]) -> dict[str, Any]:
                 details.append(f"missing {missing}")
             if extra:
                 details.append(f"extra {extra}")
-            findings.append(RegistryFinding("error", "bofire", "route reasons drifted from adapter constants: " + "; ".join(details)))
+            findings.append(RegistryFinding("error", tool_id, "route reasons drifted from adapter constants: " + "; ".join(details)))
     return result
+
+
+def validate_public_paths(
+    data: dict[str, Any],
+    tools: list[dict[str, Any]],
+    *,
+    root: Path,
+    registry_path: Path,
+) -> dict[str, Any]:
+    findings: list[RegistryFinding] = []
+    result: dict[str, Any] = {
+        "checked": True,
+        "source_count": 0,
+        "tool_doc_count": 0,
+        "mirror_count": 0,
+        "findings": findings,
+    }
+
+    source_notes = data.get("source_notes", [])
+    if not isinstance(source_notes, list):
+        findings.append(RegistryFinding("error", "_registry", "source_notes must be a list"))
+        source_notes = []
+    for source in source_notes:
+        source_path = _portable_public_path(source, "source_notes", findings)
+        if source_path is None:
+            continue
+        result["source_count"] += 1
+        if not (root / source_path).is_file():
+            findings.append(RegistryFinding("error", "_registry", f"source_notes path does not exist: {source_path.as_posix()}"))
+
+    for tool in tools:
+        tool_id = str(tool.get("tool_id") or "_unknown")
+        docs = tool.get("docs_in_repo", [])
+        if not isinstance(docs, list):
+            findings.append(RegistryFinding("error", tool_id, "docs_in_repo must be a list"))
+            continue
+        for doc in docs:
+            doc_path = _portable_public_path(doc, "docs_in_repo", findings, tool_id=tool_id)
+            if doc_path is None:
+                continue
+            result["tool_doc_count"] += 1
+            if not (root / doc_path).is_file():
+                findings.append(RegistryFinding("error", tool_id, f"docs_in_repo path does not exist: {doc_path.as_posix()}"))
+
+    expected_registry = root / "docs" / "tool-registry.json"
+    skill_docs = root / "skills" / "biosymphony-ferm-doe" / "references" / "docs"
+    if registry_path.resolve() == expected_registry.resolve() and skill_docs.is_dir():
+        mirror_pairs = (
+            (expected_registry, skill_docs / "tool-registry.json"),
+            (root / "docs" / "TOOL_REGISTRY.md", skill_docs / "TOOL_REGISTRY.md"),
+            (root / "docs" / "ADAPTER_MAP.md", skill_docs / "ADAPTER_MAP.md"),
+        )
+        for public_path, skill_path in mirror_pairs:
+            result["mirror_count"] += 1
+            if not public_path.is_file() or not skill_path.is_file():
+                findings.append(RegistryFinding("error", "_registry", f"public mirror pair is incomplete: {public_path.relative_to(root)}"))
+            elif public_path.read_bytes() != skill_path.read_bytes():
+                findings.append(RegistryFinding("error", "_registry", f"public mirror is out of sync: {public_path.relative_to(root)}"))
+    return result
+
+
+def _portable_public_path(
+    value: Any,
+    field: str,
+    findings: list[RegistryFinding],
+    *,
+    tool_id: str = "_registry",
+) -> Path | None:
+    text = str(value or "").strip()
+    if not text:
+        findings.append(RegistryFinding("error", tool_id, f"{field} contains an empty path"))
+        return None
+    path = Path(text)
+    if path.is_absolute() or ".." in path.parts:
+        findings.append(RegistryFinding("error", tool_id, f"{field} path must be repository-relative: {text}"))
+        return None
+    if path.parts and path.parts[0] in {".runtime", "logs"}:
+        findings.append(RegistryFinding("error", tool_id, f"{field} path must point to a public repository surface: {text}"))
+        return None
+    return path
 
 
 def summarize_tools(tools: list[dict[str, Any]]) -> dict[str, Any]:
@@ -369,8 +485,10 @@ def render_tool_registry_markdown(report: dict[str, Any], registry_path: Path | 
     lines.extend(
         [
             "",
-            "| Tool | Priority | Status | Extra | Claim | Route |",
-            "| --- | --- | --- | --- | --- | --- |",
+            "`Supported` is the repository requirement. `Upstream` is the newest official release observed on the checked date; it is not an adapter-compatibility claim.",
+            "",
+            "| Tool | Priority | Status | Supported | Upstream | Checked | Extra | Claim | Route |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
     )
     for tool in tools:
@@ -384,8 +502,11 @@ def render_tool_registry_markdown(report: dict[str, Any], registry_path: Path | 
                     str(tool.get("tool_id") or ""),
                     str(tool.get("priority") or ""),
                     str(tool.get("status") or ""),
+                    str(tool.get("package") or ""),
+                    str(tool.get("upstream_version") or ""),
+                    str(tool.get("last_checked") or ""),
                     str(tool.get("pyproject_extra") or ""),
-                    str(tool.get("claim_level") or ""),
+                    str(tool.get("runtime_claim_level") or tool.get("claim_level") or ""),
                     route,
                 ]
             )

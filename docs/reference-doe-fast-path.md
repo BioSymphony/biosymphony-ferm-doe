@@ -2,19 +2,20 @@
 
 ## Product Intent
 
-Many fermentation users already know commercial DOE software. BioSymphony Ferm DoE should give those users a familiar DOE path while adding campaign intelligence that generic DOE tools do not own: assay readiness, scale-transfer logic, process-phase constraints, cost/time scoring, lab packets, and follow-up memory.
+Many fermentation users already know commercial DOE software. BioSymphony Ferm DoE should give those users a familiar DOE path while adding campaign context that may not be represented in a basic DOE workflow: assay readiness, scale-transfer logic, process-phase constraints, cost/time scoring, planning packets, and follow-up memory.
 
-This is not a promise that every commercial DOE method is fully reimplemented today. BioSymphony now emits executable reference DOE artifacts locally, and every metric is labeled as exact, adapter-backed, approximate, or heuristic.
+This is not a promise that every commercial DOE method is fully reimplemented today. BioSymphony now emits reference DOE planning artifacts locally, and every metric is labeled as exact, adapter-backed, approximate, or heuristic.
 
 ## User-Facing Positioning
 
-BioSymphony should be able to say:
+Suggested user-facing wording:
 
 ```text
 If you would normally open Custom Design, Screening, RSM, Mixture,
-Space-Filling, Augment Design, or Bayesian Optimization, start here instead.
-We will build the DOE table, but we will also check whether the experiment is
-actually biologically measurable, physically runnable, and worth running.
+Space-Filling, Augment Design, or Bayesian Optimization, use this as a planning
+companion. It builds a DOE table and checks whether the experiment is
+biologically measurable, feasible under its declared constraints, and worth
+considering.
 ```
 
 ## Parity Matrix
@@ -30,7 +31,7 @@ actually biologically measurable, physically runnable, and worth running.
 | Compare Designs | Side-by-side scorecards and selected design rationale | Multi-agent tournament with skeptical assay/process/cost lanes |
 | Augment Design | Append runs to locked historical/current design under updated model | Recommend confirm, narrow, expand, pause, stop, or scale/downscale |
 | Bayesian Optimization | Historical data to candidate set, batch selection, stopping recommendation | BO is gated by assay/readiness, phase logic, and negative-result memory |
-| Profiler / Prediction | Prediction model and operating-window report | Operating window includes fermentation caveats and lab execution packet |
+| Profiler / Prediction | Prediction model and operating-window report | Operating window includes fermentation caveats and lab review packet |
 
 ## Implementation Shape
 
@@ -72,9 +73,9 @@ Optional reference DOE utilities are available when a user wants a more referenc
 
 Every utility emits `utility_manifest.json` with backend, dependency status, metric labels, artifacts, and caveats.
 
-## Worker Campaign
+## Evaluation Campaign
 
-Use `packs/issue-packs/doe-parity-v0/` when the goal is specifically to raise DOE statistical parity. Keep it separate from normal fermentation readiness so the default product does not become a generic DOE clone.
+Use `packs/issue-packs/doe-parity-v0/` when the goal is specifically to assess DOE statistical parity. Keep it separate from the default fermentation-readiness workflow so the product can state its scope clearly.
 
 The campaign should prioritize:
 
@@ -85,7 +86,7 @@ The campaign should prioritize:
 5. optional Bayesian optimization adapters
 6. user-facing parity report and examples
 
-## Product Bar
+## Success Criteria
 
 This path is successful when a DOE software user can inspect a BioSymphony dossier and find:
 

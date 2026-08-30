@@ -244,14 +244,15 @@ claiming the win in a parity report.
 1. **Done (2026-05-15)**: Pin `bofire>=0.3.1,<0.4` in `[adaptive]`
    extras. Add `adapters/bofire_strategy.py` with no top-level BoFire
    import. Add route reporting and stdlib fallback. Per-symbol
-   compatibility verified by a research agent on 2026-05-15: v0.3.1
+   compatibility checked against the public adapter surface on 2026-05-15: v0.3.1
    contains `qLogNEHVI`, `DOptimalityCriterion(formula="linear")`,
    `LinearInequalityConstraint.from_smaller_equal`, `NChooseKConstraint`
    with `none_also_valid`, `MultiFidelityStrategy.make`, and `TaskInput`,
    covering every symbol the adapter imports. The upper bound exists
-   because `main` (post-PR #705) renamed `MultiFidelityStrategy` to
-   `MultiFidelityVarianceBasedStrategy` and made `TaskInput` abstract;
-   ride those changes only after 0.4 tags.
+   because the post-PR #705 surface renamed `MultiFidelityStrategy` to
+   `MultiFidelityVarianceBasedStrategy` and made `TaskInput` abstract.
+   BoFire 0.4 and 0.5 have since shipped, but this adapter has not been
+   evaluated against them; keep the primary range unchanged until it is.
 2. **Done (2026-05-15)**: Integrate routed dispatch in follow-up planning.
    `plan-wave2` writes `bofire_strategy_report.json` when the route
    fires and only materializes BoFire candidates when execution succeeds.

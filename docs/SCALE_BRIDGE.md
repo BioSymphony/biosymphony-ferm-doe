@@ -55,7 +55,7 @@ When historical evidence shows a systematic difference between scales, record it
 
 ## Engineering recipe derivation
 
-`ferm-doe scale-recipe <campaign> --out scale_recipe.json --md-out scale_recipe.md` derives runnable engineering setpoints at both endpoints from `scale_context`. For each scale, the recipe solves for:
+`ferm-doe scale-recipe <campaign> --out scale_recipe.json --md-out scale_recipe.md` derives planning setpoints for both endpoints from `scale_context`. For each scale, the recipe solves for:
 
 - agitation RPM
 - sparge / gas flow rate (from `vvm`)

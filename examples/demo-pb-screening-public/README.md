@@ -56,7 +56,7 @@ ferm-doe plan-wave2 examples/demo-pb-screening-public \
   --out-dir /tmp/demo-pb/wave2 \
   --remaining-budget 3
 
-# 10) Compose every artifact into one shippable run packet.
+# 10) Compose every artifact into one review-ready planning packet.
 ferm-doe finalize examples/demo-pb-screening-public \
   --out /tmp/demo-pb/run_packet.md \
   --json-out /tmp/demo-pb/run_packet.json \

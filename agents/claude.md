@@ -17,7 +17,7 @@ Planning agent for fermentation and upstream bioprocess DoE. The campaign manife
 2. Fix structural errors first, then warnings.
 3. When you infer something, record it in `assumptions[]` with `status: inferred`.
 4. When scale-up or scale-down is in scope, fill `scale_context` deliberately.
-5. When the readiness verdict is `RED`, do not emit a runnable design; surface what is missing and ask the user.
+5. When the readiness verdict is `RED`, do not emit a design for execution; surface what is missing and ask the user.
 6. Close every session by updating `expected/AGENTS.md` with the resume path.
 
 ## Tools

@@ -61,14 +61,14 @@ Treat every campaign as a pre-experiment readiness program. Each step must leave
 4. Check assay readiness: `assay_readiness_report.md` plus response semantics in `campaign_state.json`.
 5. Check reagent and equipment feasibility: `readiness_scorecard.json`, `constraints.tsv`, and feasibility gates.
 6. Run design tournament: `candidate_designs.json`, `design_comparison.json`, and `design_adjudication.json`.
-7. Compile lab-ready packet: `ferm-doe-dossier/`, `experimental_setup.json`, `experimental_setup.md`, `horizontal_doe.csv`, `horizontal_doe.json`, `run-sheet.tsv`, `sampling_schedule.csv`, and `result_capture_template.csv`.
+7. Compile a review-ready planning packet: `ferm-doe-dossier/`, `experimental_setup.json`, `experimental_setup.md`, `horizontal_doe.csv`, `horizontal_doe.json`, `run-sheet.tsv`, `sampling_schedule.csv`, and `result_capture_template.csv`.
 8. Pre-register follow-up decision rules: `wave_2_decision_rules.json`, `wave_2_decision_rules.md`, and result-ingestion outputs.
 9. After first-batch results arrive, run adaptive follow-up planning: `adaptive_wave2_plan.json`, `result_ingestion_report.json`, `assay_power_results.json`, `negative_result_memory.json`, `locked_prior_runs.csv`, and `augment_design.csv`.
 10. Capture self-learning and hiccups: `learning_ledger.csv`, `hiccup_review.md`, `artifacts/<campaign>/AGENTS.md`, and dated notes when lessons should affect future campaigns.
 
 For DOE work, set `design_policy.design_intent` when the user's goal is clear. Supported intent labels are `screening`, `space_filling_scout`, `rsm_fit`, `mixture`, `custom_constrained`, `augmentation`, `confirmatory`, and `user_supplied_design`. The engine validates and labels the chosen path instead of forcing all campaigns into one DOE family.
 
-For follow-up planning work, use `ferm-doe plan-wave2` rather than manually narrowing from a result table. The `wave2` name is an internal checkpoint label, not a predetermined experiment. The loop must validate result joins, ignore excluded, QC-failed, and low-trust rows, check response-level `assay_power_policy`, preserve arm-scoped negative memory, and block `scale_or_downscale` unless bridge eligibility passes. The output is a `planned_wave2_design`. Do not call it optimized, validated, or transferred.
+For follow-up planning work, use `ferm-doe plan-wave2` rather than manually narrowing from a result table. The `wave2` name is a checkpoint label, not a predetermined experiment. The loop must validate result joins, ignore excluded, QC-failed, and low-trust rows, check response-level `assay_power_policy`, preserve arm-scoped negative memory, and block `scale_or_downscale` unless bridge eligibility passes. The output is a `planned_wave2_design`. Do not call it optimized, validated, or transferred.
 
 For self-learning DOE work, treat hiccups as first-class campaign memory. Use `learning_ledger.csv` and `hiccup_review.md` to record join failures, QC exclusions, low-trust rows, assay-power gaps, bridge blocks, chimeric arm rows, operator overrides, and pause or stop decisions. Promote broadly reusable lessons to dated notes that can affect future campaigns. Learning entries can drive manifest patches and future designs. They are not validation evidence by themselves.
 
@@ -118,11 +118,11 @@ Pointers: `references/docs/SCALE_BRIDGE_METHODOLOGY.md`, `references/templates/s
 
 ### BoFire constraint-strategy compatibility: known traps
 
-Two upstream BoFire traps have been verified in adapter checks. NChooseK plus SoboStrategy stalls indefinitely on `ask()` (BoFire issue #450, root cause `RandomStrategy._sample_with_nchoosek` enumerating combinatorial seeds for `optimize_acqf`). MultiFidelityVarianceBasedStrategy raises `ConstraintNotFulfilledError` on `ask()` with non-box constraints because the strategy does not propagate the Domain's linear or NChooseK constraints to its acquisition optimizer (BoFire issue #761).
+The repository's BoFire 0.3.1 and May 2026 main-branch checks found two compatibility traps. NChooseK plus `SoboStrategy` did not return from `ask()`, and `MultiFidelityVarianceBasedStrategy` rejected non-box constraints. Upstream issues #450 and #761 are now closed, but later tagged releases have not been evaluated against this adapter. Treat the findings as compatibility boundaries for the supported `bofire>=0.3.1,<0.4` route, not as claims about current upstream behavior.
 
-Mechanical rule. Consult `references/docs/BOFIRE_CONSTRAINT_PATTERNS.md` as the canonical strategy by constraint compatibility matrix before choosing a BoFire strategy. Default safe paths are BoFire main / PR #752 DoEStrategy plus IPOPT for NChooseK DoE screens (install `adaptive-nchoosek-doe` until that support tags), and SoboStrategy plus post-hoc cardinality enforcement (oversample 2.5x, filter, return first K) for BO refinement. For multi-fidelity, fall back to parallel D-optimal arms per fidelity tier and record `fidelity_path: fallback_parallel_arms` explicitly. ENTMOOT v2 is the swap candidate for first-class MIP-encoded NChooseK BO. It has three open risks (`min_count` not emitted by `_get_expr`, hard dependency on `gurobipy` 11 or later, and a tie-cycle in `_fantasy_tell`). Swap to ENTMOOT on a fresh campaign rather than retrofitting an existing one.
+Mechanical rule. Consult `references/docs/BOFIRE_CONSTRAINT_PATTERNS.md` before choosing a BoFire strategy. The primary BoFire adapter remains on the verified 0.3.x range. For a separate Python 3.11 or newer NChooseK DoE evaluation, `adaptive-nchoosek-doe` pins BoFire 0.4.1; that lane is unverified and does not widen the primary adapter claim. Keep row-level cardinality checks. For NChooseK BO, use the in-repo ENTMOOT or OMLT adapter. The ENTMOOT adapter closes the three integration risks documented in its design note by emitting `min_count`, using HiGHS, and handling repeated proposals. For multi-fidelity constraints, keep the parallel D-optimal arm fallback until a later BoFire release is evaluated and record `fidelity_path: fallback_parallel_arms`.
 
-Pointers: `references/docs/BOFIRE_CONSTRAINT_PATTERNS.md`, `references/docs/ENTMOOT_SWAP_DESIGN.md` (design only status).
+Pointers: `references/docs/BOFIRE_CONSTRAINT_PATTERNS.md`, `references/docs/ENTMOOT_SWAP_DESIGN.md`.
 
 ### How to evolve this section
 
@@ -156,7 +156,7 @@ Expected intake artifacts:
 - `campaign_manifest.draft.json` when enough structure exists
 - `missing_operator_items.json` with `blocker`, `warning`, or `assumed_for_wave0`
 - `research_tasks.md` or Scientific Swarm evidence-lane issues when literature or context is needed
-- `evidence_table.csv` from `references/packs/issue-packs/evidence-executor-v0/` when research agents perform external evidence collection
+- `evidence_table.csv` from `references/packs/issue-packs/evidence-executor-v0/` when external evidence collection is part of the campaign
 
 Do not ask for private strain details, confidential media formulations, unpublished sequences, API keys, or raw customer process records. Ask for sanitized summaries or secure-store references instead.
 
@@ -286,7 +286,7 @@ When authoring issue briefs or manifest patches that use engine-validated values
 rg "RESPONSE_CLASSES|SAMPLE_FRACTIONS|measurement_type|assay_required" scripts
 ```
 
-The engine can materialize `factor_space.yaml|json|csv` and `constraint_set.yaml|json|csv` entries from `inputs[]`. Inline manifest factors, responses, and constraints win when IDs conflict, and conflicts are recorded in `input_conflicts`. Multi-arm factor spaces are preserved; set `design_policy.active_factor_space` before executable design generation when multiple arms are present, or keep linked arm-specific manifests and an explicit bridge artifact.
+The engine can materialize `factor_space.yaml|json|csv` and `constraint_set.yaml|json|csv` entries from `inputs[]`. Inline manifest factors, responses, and constraints win when IDs conflict, and conflicts are recorded in `input_conflicts`. Multi-arm factor spaces are preserved; set `design_policy.active_factor_space` before design generation when multiple arms are present, or keep linked arm-specific manifests and an explicit bridge artifact.
 
 For optional remote provider execution, the launch bundle must also validate:
 

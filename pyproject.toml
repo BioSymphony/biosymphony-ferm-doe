@@ -74,12 +74,12 @@ adaptive = [
   "torch>=2.0",
 ]
 adaptive-nchoosek-doe = [
-  # BoFire main carries native NChooseK support for DoEStrategy. Use this
-  # route for cardinality-respecting DoE screens until a tagged release
-  # includes PR #752.
-  "bofire[optimization] @ git+https://github.com/experimental-design/bofire.git@main",
-  "cyipopt>=1.5",
-  "shap",
+  # BoFire 0.4 added native NChooseK support for DoEStrategy. This separate,
+  # Python 3.11+ lane is a pinned evaluation candidate, not an expansion of
+  # the verified bofire adapter range above.
+  "bofire[optimization]==0.4.1; python_version >= '3.11'",
+  "cyipopt>=1.5; python_version >= '3.11'",
+  "shap; python_version >= '3.11'",
 ]
 backend-eval = ["baybe==0.14.3; python_version < '3.14'", "ax-platform==1.2.4"]
 entmoot = ["entmoot==2.1.1", "highspy>=1.7", "pyomo>=6.7,<7", "lightgbm~=4.6.0"]

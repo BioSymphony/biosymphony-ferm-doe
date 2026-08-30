@@ -4,7 +4,7 @@ Public workspace for BioSymphony Ferm DoE.
 
 ## Mission
 
-Help users and their agents drive long-horizon, multi-agent bioprocess design campaigns from intake through follow-up. The repo is a skill any agent harness can pick up: Symphony with Linear, Claude Code workers with Linear, Codex CLI, OpenAI Agents SDK, or a custom orchestrator, running on a laptop, in CI, or behind AWS Lambda or Modal. The agent and the human share one durable artifact (`campaign_manifest.json`), pause, resume, hand off, and converge on a fermentation campaign that is worth running.
+Help users and their agents drive long-horizon, multi-agent bioprocess design campaigns from intake through follow-up. The repo is a skill any agent harness can pick up: Symphony with Linear, Claude Code workers with Linear, Codex CLI, OpenAI Agents SDK, or a custom orchestrator, running on a laptop, in CI, or behind AWS Lambda or Modal. The agent and the human share one durable artifact (`campaign_manifest.json`), pause, resume, hand off, and converge on a fermentation campaign that is ready for review.
 
 The repo ships:
 
@@ -14,7 +14,7 @@ The repo ships:
 - per-axis readiness state (responses, factors, arms, scale_context, doe, decision_rules, evidence, feasibility)
 - decision_rules / stop_rules / risk_register / assumptions blocks
 - DoE family taxonomy with minimum-runs guidance
-- a curated 47-tool BO/DoE and sidecar registry with documented adapter routing (`docs/TOOL_REGISTRY.md`, `docs/tool-registry.json`)
+- a curated BO/DoE and sidecar registry with documented adapter routing (`docs/TOOL_REGISTRY.md`, `docs/tool-registry.json`)
 - BoFire, ENTMOOT v2, OMLT, TabPFN, BoTorch, pyDOE3, SALib, scipy, PubMed MCP adapters that degrade cleanly when the optional extra is absent
 - a cumulative dossier pattern (per-corpus swarm plus integrator plus harvester) backed by `provenance.py` and `rocrate_retrofit.py`
 - a cost-model honesty stack (simulator, bulk reagent, fully-loaded COGS, CMO, range)
@@ -60,7 +60,7 @@ See `skills/biosymphony-ferm-doe/SKILL.md`. Summary: intake, readiness gate, fac
 - Treat public examples as synthetic contract fixtures, not campaign records.
 - Keep campaign routing explicit through `task_request` contracts; do not activate heavy campaign workflows for ordinary validation or docs tasks.
 - Keep issue packs tracker-neutral until a private campaign maps pack-local IDs to a tracker.
-- Preserve arm scope in DOE artifacts: per-arm executable CSVs are authoritative; horizontal DOE tables are review surfaces.
+- Preserve arm scope in DOE artifacts: per-arm design CSVs are authoritative; horizontal DOE tables are review surfaces.
 - Prefer stdlib/offline code paths in the public package; optional scientific dependencies must degrade cleanly.
 - Bounded workers (parallel sub-agents, swarm corpora, integrator and harvester roles) are coordinated through `task_request` contracts and the cumulative-dossier pattern, not ad-hoc dispatch.
 - One coherent dossier per campaign (`CITATIONS.json`, `NOTES.md`, `SOURCES.bib`, per-corpus `EVIDENCE.csv`), not N isolated reports.
@@ -71,7 +71,7 @@ See `skills/biosymphony-ferm-doe/SKILL.md`. Summary: intake, readiness gate, fac
 - Watch for accidental private paths, provider IDs, issue-tracker IDs, private biological details, or copied article tables before release.
 - Keep scale-transfer wording at planning or qualification status unless executed bridge evidence is present.
 - Keep warnings deterministic so public demos remain useful regression fixtures.
-- When BoFire's `SoboStrategy` plus `NChooseK` is requested, route to ENTMOOT v2 or enforce cardinality post-hoc; upstream issue #450 stalls indefinitely.
+- When BoFire's `SoboStrategy` plus `NChooseK` is requested, route to ENTMOOT v2 or OMLT, or enforce cardinality post-hoc. The repository's supported BoFire 0.3.x adapter retains this compatibility limit; do not generalize it to untested upstream releases.
 - When the simulator drives the planner, declare `simulator.fidelity_level` on the manifest and run the literature pressure-test template before sealing a campaign.
 
 ## Next Best Work

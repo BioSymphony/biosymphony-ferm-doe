@@ -2,7 +2,7 @@
 
 BioSymphony Ferm DoE is built for capable long-horizon agents, not as a
 closed standalone application. A user may run it through Codex, Claude Code,
-Symphony plus Linear, a `/goal`-style coordinator, or another agent harness
+Symphony plus Linear, a goal-driven coordinator, or another agent harness
 that can read files, edit manifests, run validators, dispatch workers, and use
 local or cloud resources.
 
@@ -26,8 +26,9 @@ that step as product machinery.
 - Resume paths: `AGENTS.md` handoffs, dated notes, ledgers, and
   machine-readable closeouts.
 
-The repo earns its keep by making a capable agent's work structured,
-auditable, resumable, and safer. It does not need to hide the agent.
+The repo adds value by making a capable agent's work structured,
+auditable, resumable, and safer. The agent's decisions remain visible in the
+manifest and handoff artifacts.
 
 ## What The Orchestrator Should Own
 
@@ -35,7 +36,7 @@ auditable, resumable, and safer. It does not need to hide the agent.
 - Deciding whether work runs locally, in a tracker-backed lane, or on an
   approved cloud lane.
 - Sequencing and monitoring workers, including Symphony plus Linear workers or
-  `/goal`-style task runners.
+  goal-driven task runners.
 - Reading messy inputs, asking a small number of high-leverage questions, and
   making explicit assumptions when the user chooses to proceed.
 - Installing optional extras in an isolated environment when a route needs
@@ -64,8 +65,8 @@ Treat something as a real repo gap when one of these is true:
 Do not treat something as a repo gap merely because:
 
 - There is no GUI, background daemon, or all-in-one workflow runner.
-- Linear, Symphony, Codex, Claude Code, or a `/goal` coordinator is expected to
-  create and sequence the work graph.
+- Linear, Symphony, Codex, or Claude Code is expected to create and sequence the
+  work graph.
 - The next step is obvious to a capable agent after reading the manifest,
   handoff, and validator output.
 - Optional cloud execution is present only as a launch bundle, provider
@@ -78,9 +79,9 @@ next safe action, run it with local or cloud resources, and leave auditable
 artifacts?" If yes, the workflow may be complete enough even without more
 built-in automation.
 
-## `/goal` And Symphony Patterns
+## Goal-Driven Orchestration Patterns
 
-A `/goal`-style setup should translate the user's goal into:
+A goal-driven setup should translate the user's goal into:
 
 1. A campaign manifest or task request.
 2. A small set of bounded artifacts to produce first.

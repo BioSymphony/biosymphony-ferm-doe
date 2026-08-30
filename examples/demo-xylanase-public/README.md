@@ -22,7 +22,7 @@ Non-goals:
 - no physical execution claims
 - no production-scale validation claims
 
-The demo may intentionally finish `YELLOW` or `RED` if assay, data, or feasibility caveats remain. That is part of the point: BioSymphony should prevent bad experiments, not only format runnable ones.
+The demo may intentionally finish `YELLOW` or `RED` if assay, data, or feasibility caveats remain. That is part of the point: BioSymphony should prevent bad experiments, not only format polished plans.
 
 Current verdict: `YELLOW`.
 

@@ -1,22 +1,30 @@
 # Backend Evaluation Findings
 
-**As of:** 2026-05
-**Status:** durable findings from a 6-fixture × adversarial-validator harness run against seven Bayesian optimization / DoE backends. Not a parity claim, not a benchmark in the academic sense. The fixtures are the synthetic public ones under [`../examples/adaptive-backend-eval/`](../examples/adaptive-backend-eval/), the validators are the public adversarial check shapes the public scanner enforces, and the verdict columns reflect what each adapter actually shipped on the same six problems.
+**Evaluation date:** 2026-05. **Upstream status checked:** 2026-08-30.
+**Status:** dated findings from a six-fixture validator harness across seven Bayesian optimization and DoE backends. This is neither a parity claim nor an academic benchmark. The fixtures are synthetic public examples under [`../examples/adaptive-backend-eval/`](../examples/adaptive-backend-eval/), and the verdicts apply only to the evaluated versions and conditions.
+
+Since the evaluation, BoFire 0.4 added generalized NChooseK DoE support and
+0.5.0 became the current upstream release. Issues #450 and #761 are closed.
+The later releases have not been evaluated against this repository's adapters,
+so the historical results below remain compatibility evidence only for the
+recorded versions. The primary BoFire adapter remains on `>=0.3.1,<0.4`.
 
 These findings give the public adapter list (`docs/TOOL_REGISTRY.md`, the `[bofire]`, `[entmoot]`, `[omlt]`, `[tabpfn]`, `[botorch]` extras) explicit depth rather than implicit parity. The depth ladder in [`BIOMANUFACTURING_ADAPTIVE_BACKENDS.md`](BIOMANUFACTURING_ADAPTIVE_BACKENDS.md) is the one-line summary; this doc is the long form.
 
 ## Provenance and reproducibility
 
-The sweep itself ran in a separate workspace where tool-validation work for these backends happened. The public repo ships three of the four parts that make the findings inspectable, leaving out the parts that are operational state rather than transferable learning:
+The repository includes the transferable inputs needed to inspect the evaluation:
 
-- **Public (in this repo):** the synthetic fixtures (`examples/adaptive-backend-eval/`), the adapter source code (`src/biosymphony_ferm_doe/adapters/{bofire_strategy,entmoot_strategy,omlt_strategy,tabpfn_strategy,botorch_wave2}.py`), the adversarial validators (`scripts/validate_smoke_artifacts.py`, `docs/schemas/smoke-artifact-contract.json`), and the methodology lessons (this doc plus [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md)). A contributor with a clean clone can rebuild and re-run the sweep from these four pieces and produce comparable verdict columns.
-- **Out of scope for this repo by design:** the runner scripts that produced these specific numbers, the raw per-fixture run output (`result.json`, `candidate_table.csv`, `constraint_check.json`, `route_report.json`), and operational provider state (pod identifiers, runtime instrumentation, paid-compute traces). None of those are load-bearing for understanding the findings; the load-bearing parts crossed over.
+- the synthetic fixtures in `examples/adaptive-backend-eval/`
+- the public adapter source under `src/biosymphony_ferm_doe/adapters/`
+- the artifact validators and smoke-artifact schema
+- the methodology notes in this document and [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md)
 
-The findings below should be read as "what each adapter produced on those fixtures during that sweep, written down so a future contributor or a future BioSymphony agent does not have to re-discover it." Single-seed (42), single sweep, mid-2026-05 versions; see "What was not tested" for the caveats.
+The raw per-fixture outputs from the original evaluation are not distributed here, so the exact numerical results are not independently reproducible from this repository alone. Read the findings as a dated, single-seed record, not as current-release performance evidence. See "What was not tested" for the remaining caveats.
 
 ## Headline
 
-For NChooseK-constrained Bayesian optimization, **OMLT supersedes ENTMOOT** as the cardinality workhorse in the public adapter set. The one-line encoding difference that produced the supersession is documented under "ENTMOOT definition-correction" and "OMLT lower-coupling fix" in [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md). BoFire main as of mid-2026-05 does **not** collapse the MIP-based BO slot: PRs [#747](https://github.com/experimental-design/bofire/pull/747) (BONSAI pruning) and [#753](https://github.com/experimental-design/bofire/pull/753) (shared-variable NChooseK) reduce but do not eliminate the BO leak, and the `SoboStrategy + NChooseK` enumeration stall (upstream issue [#450](https://github.com/experimental-design/bofire/issues/450)) is still active. For a first-batch NChooseK DoE screen, use the BoFire-main PR #752 route documented in [`BOFIRE_CONSTRAINT_PATTERNS.md`](BOFIRE_CONSTRAINT_PATTERNS.md); for NChooseK BO, OMLT or ENTMOOT remain the routed slots.
+In the May 2026 evaluation, OMLT produced the cleanest NChooseK result under the delivered-amount definition. The encoding difference from ENTMOOT is documented under "ENTMOOT definition-correction" and "OMLT lower-coupling fix" in [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md). The evaluated BoFire 0.3.1 and May main-branch routes did not replace the MIP-backed BO slot. For NChooseK BO, OMLT and ENTMOOT therefore remain the conservative routes until a later BoFire release is evaluated here.
 
 ## Constraint-honoring spectrum
 
@@ -28,10 +36,10 @@ Ranking is on `NChooseK leak rate` on a 4-factor `1-of-2 active among 4 carbons`
 | 2 | **TabPFN v3 (8.0.3)** | **0 / 16** | 0 | Foundation-model surrogate; sample-then-rank acquisition; low-data slot (n < 20, factors ≤ 8). |
 | 3 | **BoFire 0.3.1** | FAIL_CLOSED (route declines) | FAIL_CLOSED | Honest-and-strict; routes to ENTMOOT/OMLT for NChooseK. Unchanged. |
 | 4 | **BoTorch 0.17.2 direct** (separate cost-weighted wrapper, not the public `botorch_wave2.py`) | Budget-sensitive: 0/16 kept at q=16, 0/64 at q=64, **37/256** at q=256 | n/a (no native cost constraint here) | Honest-and-rejection. Footnote: see "BoTorch direct budget transition" below. The public `botorch_wave2.py` follow-up adapter is a different surface and does not apply cost weighting; the trap below documents the broader pattern. |
-| 5 | **ENTMOOT 2.1.1** | 5 / 16 under the `x_i > 0` definition; 0 / 16 under the binary-indicator definition | 0 | Definition-scoped: indicator-only PASS; lab-semantic FAIL. Superseded by OMLT for new campaigns; valid for existing rigs. |
+| 5 | **ENTMOOT 2.1.1** | 5 / 16 under the `x_i > 0` definition; 0 / 16 under the binary-indicator definition | 0 | Definition-scoped: indicator-only PASS; lab-semantic FAIL. The May 2026 evaluation ranked OMLT ahead for new campaigns; ENTMOOT remains supported for existing rigs. |
 | 6 | **BayBE 0.14.3** | LEAKY — ~75% of candidates on the 4-factor cardinality fixture violate NChooseK | 0 | Honest but leaky on NChooseK; clean elsewhere. |
 | 7 | **ProcessOptimizer 1.1.2** | LEAKY — ~95% on the cardinality fixture | 1 on the linear fixture | Honest but leaky on both NChooseK and linear. |
-| FAIL | **BoFire main BO probes** (mid-2026-05) | NChooseK DoE is now routed separately through PR #752; `SoboStrategy` emitted 0 candidates in 300s (issue [#450](https://github.com/experimental-design/bofire/issues/450) still active) | n/a | Does NOT supersede the MIP-based BO slot. |
+| FAIL | **BoFire main BO probes** (mid-2026-05) | NChooseK DoE was routed separately through PR #752; `SoboStrategy` emitted 0 candidates in 300s (issue [#450](https://github.com/experimental-design/bofire/issues/450) was open at evaluation time) | n/a | Did not replace the MIP-based BO slot in this dated evaluation. |
 
 The unconstrained-fixture cells, the bounds-only fixture cell, and the linear-only cell for backends not listed here as leaky are all clean. The leaky cells in the table are exactly the cells where each backend's documented limitations live; this is consistent with each backend's upstream documentation.
 
@@ -66,23 +74,23 @@ TabPFN v3 is the Prior Labs foundation-model regressor wrapped as a BoTorch surr
 
 **Result on the 6-fixture sweep:** 5 / 6 PASS locally (0 NChooseK leaks, 0 linear leaks where the fixture exercises those classes); 1 / 6 deferred (`cost_aware_multiobjective` — see "Multi-objective notes" below).
 
-**Caveats:** non-commercial license on TabPFN v3 / v2.5 / v2.6 (the older `v2-reg` is Apache-2.0); Gaussian-approximation posterior wrap may underestimate uncertainty in highly non-Gaussian regions; TabPFN fit scales O(n²) — at n > 500 a different surrogate is needed; no batch-fantasies path (single-fidelity only). Routing rules and the Gaussian-approximation design decision are in [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md).
+**Caveats:** the default TabPFN-3 weights are non-commercial. The code and v2 weights use the Prior Labs License, an Apache-2.0 derivative with an attribution provision. Review the applicable terms before use. The Gaussian-approximation posterior wrap may underestimate uncertainty in highly non-Gaussian regions; TabPFN fit scales O(n²), and there is no batch-fantasies path. Routing rules and the Gaussian-approximation design decision are in [`ADAPTER_DESIGN_NOTES.md`](ADAPTER_DESIGN_NOTES.md).
 
 ### BoFire 0.3.1: strict constrained-DoE default
 
 Unchanged this cycle. Routes constrained DoE through `DoEStrategy + DOptimalityCriterion + IPOPT`, single-objective constrained BO through `SoboStrategy`, multi-fidelity through `MultiFidelityVarianceBasedStrategy` (with the parallel-arms fallback documented in [`BOFIRE_CONSTRAINT_PATTERNS.md`](BOFIRE_CONSTRAINT_PATTERNS.md)). For NChooseK BO, routes decline and the agent falls back to ENTMOOT/OMLT. The spectrum table labels this as FAIL_CLOSED. Stays the default constrained-DoE/BO route per [`BOFIRE_POSITIONING.md`](BOFIRE_POSITIONING.md).
 
-### BoFire main: DoE screen route with BO limits
+### BoFire May 2026 main snapshot: DoE screen route with BO limits
 
 Tested against BoFire `main` as of mid-2026-05 while probing whether main removed the need for MIP-backed NChooseK BO. Two findings remain load-bearing:
 
 1. **`DoEStrategy` + `NChooseK`:** use the PR #752 route for model-free NChooseK DoE screens. The pinned `bofire>=0.3.1,<0.4` extra predates that path, so this repo exposes `adaptive-nchoosek-doe` for the main-branch route and requires row-level cardinality rechecks. This DoE screen route does not change the BO workhorse decision below.
 
-2. **`SoboStrategy` + `NChooseK` + linear:** PR #753's shared-variable NChooseK does not unblock the SLSQP stall. 300-second timeout, 0 candidates emitted. Upstream issue [#450](https://github.com/experimental-design/bofire/issues/450) is still active on main.
+2. **`SoboStrategy` + `NChooseK` + linear:** PR #753's shared-variable NChooseK did not unblock the evaluated SLSQP path. The run timed out after 300 seconds with no candidates. Upstream issue [#450](https://github.com/experimental-design/bofire/issues/450) was open at evaluation time and is now closed; the later tagged behavior has not been evaluated here.
 
-**Disposition:** use BoFire main/#752 for first-batch NChooseK DoE screens; keep ENTMOOT v2 (with the lower-coupling fix below) or OMLT (which ships the fix) as the NChooseK BO workhorse. The ENTMOOT swap design ([`ENTMOOT_SWAP_DESIGN.md`](ENTMOOT_SWAP_DESIGN.md)) and the constraint-patterns playbook ([`BOFIRE_CONSTRAINT_PATTERNS.md`](BOFIRE_CONSTRAINT_PATTERNS.md)) remain current.
+**Disposition:** the `adaptive-nchoosek-doe` extra now pins BoFire 0.4.1 as a separate Python 3.11 or newer evaluation lane. It is not part of the verified primary adapter range. Keep ENTMOOT or OMLT as the conservative NChooseK BO route until a later BoFire release passes the public fixtures.
 
-**Limits:** single seed, single sweep day; the upstream branch moves. Worth re-testing when a tagged release (>= 0.3.2) lands. A separate observation worth a future probe: a `MultiFidelityVarianceBasedStrategy` retest succeeded on a 12-input domain in ~90 seconds, even while bare `SoboStrategy` stalls on the same 12-input shape. Whether issue #450 is strategy-specific or domain-shape-dependent is open.
+**Limits:** single seed and single evaluation day. A later-release evaluation is required before changing the compatibility claim. A separate May observation found that `MultiFidelityVarianceBasedStrategy` returned on one 12-input domain while bare `SoboStrategy` did not return on the same shape; the evaluation did not establish whether that difference was strategy-specific or domain-shape-dependent.
 
 ### BoTorch direct — budget-sensitive, wrapper-side trap
 
